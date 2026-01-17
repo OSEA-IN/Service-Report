@@ -270,10 +270,102 @@ select.valid {
 
 /* ==================== End Success Modal ==================== */
 
-/* ==================== Location Permission Modal (DISABLED) ==================== */
-/* Location tracking has been disabled for ease of use.
-   For the version with location/GPS capability, see: with-location-demo/
-   The original location modal styles have been removed. */
+/* ==================== Location Permission Modal ==================== */
+.location-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.location-modal.visible {
+    display: flex;
+}
+
+.location-modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.location-modal-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.location-modal-content h2 {
+    color: #1a5276;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+}
+
+.location-modal-content > p {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.allow-location-btn {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.allow-location-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+}
+
+.allow-location-btn:active {
+    transform: translateY(0);
+}
+
+.allow-location-btn.loading {
+    background: #95a5a6;
+    cursor: wait;
+}
+
+.allow-location-btn.success {
+    background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
+}
+
+.location-note {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 15px;
+}
+
 /* ==================== End Location Modal ==================== */
 
 body {

@@ -4,7 +4,7 @@
 let machineCount = 0;
 let navVisible = false; // Start hidden on mobile
 let engineers = []; // Array of {title, name} objects
-// Location tracking disabled for ease of use - see with-location-demo/ for version with GPS
+let locationPermissionGranted = false; // Track if we have location permission
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize mobile validation
     initMobileValidation();
 
-    // Location permission disabled - no prompt needed
+    // Check and request location permission
+    initLocationPermission();
 
     // Initialize progress bar
     initProgressBar();
@@ -68,9 +69,100 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollTo(0, 0);
 });
 
-// ==================== LOCATION PERMISSION (DISABLED) ====================
-// Location tracking has been disabled for ease of use.
-// For the version with location/GPS capability, see: with-location-demo/
+// ==================== LOCATION PERMISSION ====================
+
+/**
+ * Initialize location permission flow
+ * Shows modal on first visit or if permission not yet granted
+ */
+function initLocationPermission() {
+    // FIRST: Check localStorage - if we've granted before, trust it
+    const savedPermission = localStorage.getItem('oseaLocationPermission');
+    if (savedPermission === 'granted') {
+        locationPermissionGranted = true;
+        return; // Don't show modal
+    }
+
+    // THEN: Check Permissions API if available
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+            if (result.state === 'granted') {
+                // Already have permission
+                locationPermissionGranted = true;
+                localStorage.setItem('oseaLocationPermission', 'granted');
+            } else if (result.state === 'prompt') {
+                // Need to ask - show our pre-prompt modal
+                showLocationModal();
+            } else if (result.state === 'denied') {
+                // Previously denied - show modal with different message
+                showLocationModal(true);
+            }
+
+            // Listen for permission changes
+            result.onchange = function() {
+                if (this.state === 'granted') {
+                    locationPermissionGranted = true;
+                    localStorage.setItem('oseaLocationPermission', 'granted');
+                    hideLocationModal();
+                }
+            };
+        }).catch(function() {
+            // Permissions API not supported, show modal
+            showLocationModal();
+        });
+    } else {
+        // Permissions API not supported (older browsers, iOS Safari)
+        // Show modal since we don't have localStorage confirmation
+        showLocationModal();
+    }
+}
+
+/**
+ * Fallback for browsers without Permissions API
+ */
+function checkLocationFallback() {
+    const savedPermission = localStorage.getItem('oseaLocationPermission');
+    if (savedPermission === 'granted') {
+        locationPermissionGranted = true;
+    } else {
+        // Show modal to request permission
+        showLocationModal();
+    }
+}
+
+/**
+ * Show the location permission modal
+ * @param {boolean} wasDenied - If true, user previously denied permission
+ */
+function showLocationModal(wasDenied = false) {
+    const modal = document.getElementById('location-modal');
+    const btn = document.getElementById('allowLocationBtn');
+    const note = modal.querySelector('.location-note');
+
+    if (wasDenied) {
+        // Update message for denied state
+        modal.querySelector('h2').textContent = 'Location Access Needed';
+        modal.querySelector('p').textContent = 'Location permission was denied. To submit reports, please enable location access in your browser settings.';
+        btn.textContent = 'Try Again';
+        note.textContent = 'You may need to enable location in browser settings.';
+    }
+
+    // Set up button click handler
+    btn.onclick = requestLocationPermission;
+
+    // Show modal
+    modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Hide the location permission modal
+ */
+function hideLocationModal() {
+    const modal = document.getElementById('location-modal');
+    modal.classList.remove('visible');
+    document.body.style.overflow = '';
+}
 
 // ==================== Success Modal Functions ====================
 
@@ -229,6 +321,63 @@ document.addEventListener('DOMContentLoaded', initValidation);
 // ==================== End Validation Feedback ====================
 
 // ==================== End Success Modal ====================
+
+/**
+ * Request location permission when user clicks Allow button
+ */
+function requestLocationPermission() {
+    const btn = document.getElementById('allowLocationBtn');
+    const note = document.querySelector('.location-note');
+
+    // Show loading state
+    btn.textContent = 'Requesting...';
+    btn.classList.add('loading');
+    btn.disabled = true;
+    note.textContent = 'Please tap "Allow" on the browser prompt.';
+
+    // Actually request location
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            // Success - permission granted
+            locationPermissionGranted = true;
+            localStorage.setItem('oseaLocationPermission', 'granted');
+
+            // Show success state briefly
+            btn.textContent = '✓ Location Enabled';
+            btn.classList.remove('loading');
+            btn.classList.add('success');
+            note.textContent = 'You\'re all set!';
+
+            // Hide modal after short delay
+            setTimeout(function() {
+                hideLocationModal();
+                showStatus('Location access enabled. You can now submit reports.', 'success');
+            }, 1000);
+        },
+        function(error) {
+            // Failed - permission denied or error
+            btn.classList.remove('loading');
+            btn.disabled = false;
+
+            if (error.code === error.PERMISSION_DENIED) {
+                btn.textContent = 'Permission Denied - Try Again';
+                note.textContent = 'Please enable location in your browser settings and try again.';
+                localStorage.setItem('oseaLocationPermission', 'denied');
+            } else if (error.code === error.TIMEOUT) {
+                btn.textContent = 'Timed Out - Try Again';
+                note.textContent = 'Location request timed out. Please try again.';
+            } else {
+                btn.textContent = 'Try Again';
+                note.textContent = 'Could not get location. Please ensure location services are enabled.';
+            }
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
+}
 
 // Initialize checkboxes and radio buttons with proper mobile touch handling
 function initCheckboxes() {
@@ -2091,7 +2240,7 @@ const AUTOSAVE_CONFIG = {
     secretKey: 'osea-sr-2026-yourSecretHere123',  // Must match Apps Script
 
     geolocation: {
-        required: false,          // Location tracking DISABLED for ease of use
+        required: true,
         timeout: 15000,           // 15 seconds to get location
         maximumAge: 60000,        // Accept cached location up to 1 minute old
         enableHighAccuracy: true  // Use GPS, not just IP-based
@@ -2274,13 +2423,34 @@ function collectFormData() {
 
 /**
  * Submit report to Google Drive
- * Note: Location tracking disabled for ease of use
  */
 async function submitReport() {
     const statusMsg = document.getElementById('statusMsg');
 
     try {
-        // Step 1: Validate required fields
+        // Step 0: Check if location permission is granted
+        if (!locationPermissionGranted) {
+            showStatus('Location permission required. Please allow location access.', 'error');
+            showLocationModal();
+            return;
+        }
+
+        // Step 1: Show getting location message
+        showStatus('Getting location...', 'info');
+
+        let geolocation;
+        try {
+            geolocation = await getGeolocation();
+        } catch (error) {
+            // Permission might have been revoked - show modal again
+            locationPermissionGranted = false;
+            localStorage.removeItem('oseaLocationPermission');
+            showStatus('Location required to submit. Please allow location access.', 'error');
+            showLocationModal();
+            return;
+        }
+
+        // Step 2: Validate required fields
         const mobileInput = document.getElementById('contactMobile');
         if (!mobileInput.value || mobileInput.value.length !== 10) {
             showStatus('Please enter a valid 10-digit mobile number', 'error');
@@ -2294,20 +2464,20 @@ async function submitReport() {
             return;
         }
 
-        // Step 2: Collect all data
+        // Step 3: Collect all data
         showStatus('Preparing report...', 'info');
         const formData = collectFormData();
 
-        // Step 3: Add audit data (location tracking disabled)
+        // Step 4: Add audit data
         formData.audit = {
-            geolocation: null,  // Location tracking disabled for ease of use
+            geolocation: geolocation,
             device: getDeviceInfo()
         };
 
-        // Step 4: Add secret key for authentication
+        // Step 5: Add secret key for authentication
         formData.secretKey = AUTOSAVE_CONFIG.secretKey;
 
-        // Step 5: Check if online
+        // Step 6: Check if online
         if (!navigator.onLine) {
             // Save to offline queue
             saveToOfflineQueue(formData);
@@ -2315,7 +2485,7 @@ async function submitReport() {
             return;
         }
 
-        // Step 6: Submit to API
+        // Step 7: Submit to API
         showStatus('Submitting report...', 'info');
 
         let lastError;
@@ -2361,14 +2531,28 @@ async function submitReport() {
 /**
  * Submit report silently (called after PDF generation)
  * Runs in background without blocking user, shows minimal status updates
- * Note: Location tracking disabled for ease of use
  */
 async function submitReportSilent() {
     try {
-        // Collect form data (no location tracking)
+        // Get geolocation (may already be cached from recent use)
+        let geolocation;
+        try {
+            geolocation = await getGeolocation();
+        } catch (error) {
+            console.log('Silent submit: Location not available, saving offline');
+            // Save to offline queue without location - will need manual submit later
+            const formData = collectFormData();
+            formData.audit = { device: getDeviceInfo(), geolocation: null };
+            formData.secretKey = AUTOSAVE_CONFIG.secretKey;
+            saveToOfflineQueue(formData);
+            showStatus('PDF generated. Report saved offline (location unavailable).', 'warning');
+            return;
+        }
+
+        // Collect form data
         const formData = collectFormData();
         formData.audit = {
-            geolocation: null,  // Location tracking disabled for ease of use
+            geolocation: geolocation,
             device: getDeviceInfo()
         };
         formData.secretKey = AUTOSAVE_CONFIG.secretKey;

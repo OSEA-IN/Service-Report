@@ -849,6 +849,7 @@ select.valid:focus {
     width: 100%;
     border-collapse: collapse;
     margin-top: 12px;
+    table-layout: fixed; /* Force columns to respect widths */
 }
 
 .dynamic-table th {
@@ -858,6 +859,23 @@ select.valid:focus {
     font-size: 13px;
     font-weight: 600;
     text-align: left;
+}
+
+/* Table column widths for Pending Actions & Parts/Materials */
+.dynamic-table th:first-child {
+    width: 40%; /* Action Required / Part Description */
+}
+
+.dynamic-table th:nth-child(2) {
+    width: 22%; /* Responsibility / Qty */
+}
+
+.dynamic-table th:nth-child(3) {
+    width: 25%; /* Target Date / Remarks */
+}
+
+.dynamic-table th:last-child {
+    width: 13%; /* Action buttons */
 }
 
 .dynamic-table td {
@@ -1891,10 +1909,17 @@ select.valid:focus {
         padding: 14px;
     }
 
-    /* Navigation */
+    /* Navigation - Hidden by default on mobile */
     .nav-sidebar {
         width: 85%;
         max-width: 300px;
+        transform: translateX(-100%) !important; /* Force hidden on mobile */
+        visibility: hidden;
+    }
+
+    .nav-sidebar.visible {
+        transform: translateX(0) !important;
+        visibility: visible;
     }
 
     /* Machine cards */

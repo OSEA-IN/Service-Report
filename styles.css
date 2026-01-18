@@ -2075,10 +2075,12 @@ select.valid:focus {
         height: 48px; /* Explicit height for consistent sizing */
     }
 
-    /* iOS Safari date input - ensure consistent styling */
+    /* iOS Safari date input - ensure consistent styling and height even when empty */
     .dynamic-table input[type="date"] {
         border: 2px solid var(--gray-200);
         background-color: var(--white);
+        min-height: 48px; /* Force minimum height even when empty */
+        line-height: 24px; /* Help maintain height in empty state */
     }
 
     .dynamic-table .action-buttons {

@@ -2054,6 +2054,16 @@ select.valid:focus {
         border-radius: var(--radius-sm); /* Ensure rounded corners on mobile */
     }
 
+    /* iOS Safari date input - force rounded corners */
+    .dynamic-table input[type="date"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: var(--radius-sm) !important;
+        border: 2px solid var(--gray-200);
+        background-color: var(--white);
+    }
+
     .dynamic-table .action-buttons {
         display: flex;
         gap: 10px;

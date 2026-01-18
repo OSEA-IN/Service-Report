@@ -2032,6 +2032,7 @@ select.valid:focus {
         display: block;
         padding: 0;
         border: none;
+        width: 100%; /* Ensure td takes full width so inputs inside can be 100% */
     }
 
     .dynamic-table td::before {
@@ -2047,6 +2048,7 @@ select.valid:focus {
     .dynamic-table select {
         padding: 12px;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
     }
 

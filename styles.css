@@ -2074,10 +2074,11 @@ select.valid:focus {
         appearance: none;
     }
 
-    /* iOS Safari date input - ensure consistent styling */
+    /* iOS Safari date input - ensure consistent styling and height */
     .dynamic-table input[type="date"] {
         border: 2px solid var(--gray-200);
         background-color: var(--white);
+        height: 48px; /* Match select box height */
     }
 
     .dynamic-table .action-buttons {

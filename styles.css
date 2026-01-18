@@ -1948,18 +1948,31 @@ select.valid:focus {
     /* List items - ensure input fills space, buttons stay visible */
     .list-item {
         flex-wrap: nowrap;
+        gap: 6px; /* Tighter gap on mobile */
     }
 
     .list-item input {
         min-width: 0; /* Allow flex shrinking */
-        padding: 12px;
+        padding: 10px 12px;
+    }
+
+    .list-item .item-number {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+    }
+
+    .list-item .bullet,
+    .list-item .item-bullet {
+        width: 18px;
+        font-size: 16px;
     }
 
     .list-item .add-item-btn,
     .list-item .remove-item-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
     }
 
     /* Navigation - Hidden by default on mobile */
@@ -2033,7 +2046,15 @@ select.valid:focus {
     .dynamic-table input,
     .dynamic-table select {
         padding: 12px;
-        width: 100%; /* Full width on mobile card layout */
+        width: 100% !important; /* Full width on mobile card layout */
+        box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    /* Ensure date inputs display properly on iOS */
+    .dynamic-table input[type="date"] {
+        min-height: 44px; /* iOS minimum touch target */
     }
 
     .dynamic-table .action-buttons {

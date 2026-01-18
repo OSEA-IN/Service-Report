@@ -1945,6 +1945,23 @@ select.valid:focus {
         padding: 14px;
     }
 
+    /* List items - ensure input fills space, buttons stay visible */
+    .list-item {
+        flex-wrap: nowrap;
+    }
+
+    .list-item input {
+        min-width: 0; /* Allow flex shrinking */
+        padding: 12px;
+    }
+
+    .list-item .add-item-btn,
+    .list-item .remove-item-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
     /* Navigation - Hidden by default on mobile */
     .nav-sidebar {
         width: 85%;
@@ -2016,12 +2033,7 @@ select.valid:focus {
     .dynamic-table input,
     .dynamic-table select {
         padding: 12px;
-    }
-
-    /* Date inputs don't need full width on mobile */
-    .dynamic-table input[type="date"] {
-        width: auto;
-        max-width: 180px;
+        width: 100%; /* Full width on mobile card layout */
     }
 
     .dynamic-table .action-buttons {

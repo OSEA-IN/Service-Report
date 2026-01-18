@@ -1855,7 +1855,7 @@ select.valid:focus {
         padding: 12px;
         padding-top: 70px;
         padding-bottom: 100px;
-        padding-left: 12px; /* Same as right padding - content is centered */
+        /* No extra left padding - toggle button floats over content */
     }
 
     .progress-bar {
@@ -1881,9 +1881,9 @@ select.valid:focus {
 
     .nav-toggle-btn {
         left: 8px;
-        top: 62px;
-        width: 36px;
-        height: 36px;
+        top: 10px; /* Move into progress bar area */
+        width: 34px;
+        height: 34px;
     }
 
     .form-container {

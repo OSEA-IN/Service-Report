@@ -2020,8 +2020,8 @@ select.valid:focus {
 
     .dynamic-table tr {
         display: flex;
-        flex-direction: column;
-        align-items: stretch; /* Force children to stretch full width */
+        flex-wrap: wrap; /* Allow items to wrap into rows */
+        align-items: stretch;
         background: var(--white);
         padding: 14px;
         border-radius: var(--radius-md);
@@ -2034,6 +2034,26 @@ select.valid:focus {
         padding: 0;
         border: none;
         overflow: visible; /* Allow border-radius to show */
+    }
+
+    /* First column (Action Required) - full width */
+    .dynamic-table td:first-child {
+        flex: 1 1 100%;
+    }
+
+    /* Second column (Responsibility) - half width */
+    .dynamic-table td:nth-child(2) {
+        flex: 1 1 calc(50% - 5px);
+    }
+
+    /* Third column (Target Date) - half width */
+    .dynamic-table td:nth-child(3) {
+        flex: 1 1 calc(50% - 5px);
+    }
+
+    /* Fourth column (Action buttons) - full width */
+    .dynamic-table td:last-child {
+        flex: 1 1 100%;
     }
 
     .dynamic-table td::before {

@@ -2051,6 +2051,7 @@ select.valid:focus {
         width: 100%;
         min-width: 0; /* Prevent flex overflow */
         box-sizing: border-box;
+        border-radius: var(--radius-sm); /* Ensure rounded corners on mobile */
     }
 
     .dynamic-table .action-buttons {

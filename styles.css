@@ -747,17 +747,28 @@ select.valid:focus {
     background: var(--gray-50);
 }
 
+/* Form rows inside machine body - remove horizontal padding since machine-body provides it */
+.machine-body .form-row {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /* Subsections */
 .subsection-title {
     color: var(--brand-primary);
     font-size: 14px;
     font-weight: 700;
-    margin: 20px 0 10px 0;
+    margin: 20px 0 12px 0;
     padding-bottom: 6px;
     border-bottom: 2px solid var(--brand-primary);
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* First subsection title shouldn't have top margin */
+.subsection:first-child .subsection-title {
+    margin-top: 0;
 }
 
 .subsection-title button {
@@ -786,11 +797,14 @@ select.valid:focus {
 
 .list-item input {
     flex: 1;
-    padding: 12px 14px;
+    padding: 14px 16px; /* Match .form-group input */
     border: 2px solid var(--gray-200);
     border-radius: var(--radius-md);
     font-size: 16px;
     font-family: inherit;
+    font-weight: 500;
+    color: var(--gray-900);
+    background: var(--white);
 }
 
 .list-item input:focus {

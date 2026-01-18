@@ -2046,19 +2046,8 @@ select.valid:focus {
     .dynamic-table input,
     .dynamic-table select {
         padding: 12px;
-        width: 100% !important; /* Full width on mobile card layout */
+        width: 100%;
         box-sizing: border-box;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    /* Ensure date inputs display properly on iOS - match select width */
-    .dynamic-table input[type="date"] {
-        min-height: 44px; /* iOS minimum touch target */
-        display: block;
-        width: 100% !important;
-        max-width: 100%;
-        -webkit-min-logical-width: calc(100% - 24px);
     }
 
     .dynamic-table .action-buttons {

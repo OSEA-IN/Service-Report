@@ -2052,9 +2052,13 @@ select.valid:focus {
         appearance: none;
     }
 
-    /* Ensure date inputs display properly on iOS */
+    /* Ensure date inputs display properly on iOS - match select width */
     .dynamic-table input[type="date"] {
         min-height: 44px; /* iOS minimum touch target */
+        display: block;
+        width: 100% !important;
+        max-width: 100%;
+        -webkit-min-logical-width: calc(100% - 24px);
     }
 
     .dynamic-table .action-buttons {

@@ -1403,6 +1403,10 @@ select.valid:focus {
     transform: translateX(0);
 }
 
+.nav-sidebar.hidden {
+    transform: translateX(-240px);
+}
+
 .nav-header {
     padding: 0 16px 16px 16px;
     border-bottom: 2px solid var(--gold-500);
@@ -1811,7 +1815,7 @@ select.valid:focus {
         padding: 12px;
         padding-top: 70px;
         padding-bottom: 100px;
-        padding-left: 12px !important;
+        padding-left: 50px; /* Space for toggle button */
     }
 
     .progress-bar {
@@ -1833,6 +1837,13 @@ select.valid:focus {
     .step-label {
         font-size: 8px;
         display: block !important;
+    }
+
+    .nav-toggle-btn {
+        left: 8px;
+        top: 62px;
+        width: 36px;
+        height: 36px;
     }
 
     .form-container {
@@ -1884,13 +1895,6 @@ select.valid:focus {
     .nav-sidebar {
         width: 85%;
         max-width: 300px;
-    }
-
-    .nav-toggle-btn {
-        left: 8px;
-        top: 62px;
-        width: 36px;
-        height: 36px;
     }
 
     /* Machine cards */
@@ -2069,11 +2073,32 @@ select.valid:focus {
         padding: 32px;
         padding-top: 80px;
         padding-bottom: 40px;
+        padding-left: 280px; /* Space for sidebar by default */
+        transition: padding-left var(--transition-base);
+    }
+
+    /* Sidebar closed - content shifts left */
+    body.nav-closed {
+        padding-left: 60px; /* Space for toggle button only */
     }
 
     /* Sidebar visible by default on desktop */
-    body.nav-open {
-        padding-left: 280px;
+    .nav-sidebar {
+        transform: translateX(0); /* Visible by default on desktop */
+    }
+
+    .nav-sidebar.hidden {
+        transform: translateX(-240px);
+    }
+
+    .nav-toggle-btn {
+        left: 250px; /* Position at sidebar edge when open */
+        transition: left var(--transition-base);
+    }
+
+    body.nav-closed .nav-toggle-btn,
+    .nav-toggle-btn.nav-hidden {
+        left: 12px;
     }
 
     .progress-bar {

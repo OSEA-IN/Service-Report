@@ -851,8 +851,6 @@ select.valid:focus {
     border-spacing: 0; /* Remove gaps between cells */
     margin-top: 12px;
     table-layout: fixed; /* Force columns to respect widths */
-    border-radius: var(--radius-sm);
-    overflow: hidden; /* Clip corners */
 }
 
 .dynamic-table th {
@@ -867,7 +865,7 @@ select.valid:focus {
 /* Table column widths for Pending Actions & Parts/Materials */
 .dynamic-table th:first-child {
     width: 40%; /* Action Required / Part Description */
-    border-radius: var(--radius-sm) 0 0 0; /* Top-left rounded */
+    border-top-left-radius: var(--radius-sm); /* Round top-left corner */
 }
 
 .dynamic-table th:nth-child(2) {
@@ -880,22 +878,22 @@ select.valid:focus {
 
 .dynamic-table th:last-child {
     width: 13%; /* Action buttons */
-    border-radius: 0 var(--radius-sm) 0 0; /* Top-right rounded */
-}
-
-/* Rounded corners on table body bottom row */
-.dynamic-table tbody tr:last-child td:first-child {
-    border-radius: 0 0 0 var(--radius-sm); /* Bottom-left rounded */
-}
-
-.dynamic-table tbody tr:last-child td:last-child {
-    border-radius: 0 0 var(--radius-sm) 0; /* Bottom-right rounded */
+    border-top-right-radius: var(--radius-sm); /* Round top-right corner */
 }
 
 .dynamic-table td {
     padding: 6px 4px; /* Tighter horizontal padding to align inputs with headers */
     border: 1px solid var(--gray-200);
     background: var(--white);
+}
+
+/* Round bottom corners of last row */
+.dynamic-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: var(--radius-sm);
+}
+
+.dynamic-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: var(--radius-sm);
 }
 
 .dynamic-table input,

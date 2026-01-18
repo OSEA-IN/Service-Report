@@ -847,9 +847,12 @@ select.valid:focus {
 /* Tables */
 .dynamic-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate; /* Required for border-radius to work */
+    border-spacing: 0; /* Remove gaps between cells */
     margin-top: 12px;
     table-layout: fixed; /* Force columns to respect widths */
+    border-radius: var(--radius-sm);
+    overflow: hidden; /* Clip corners */
 }
 
 .dynamic-table th {

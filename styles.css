@@ -2033,7 +2033,7 @@ select.valid:focus {
         display: block;
         padding: 0;
         border: none;
-        overflow: hidden; /* Prevent children from overflowing */
+        overflow: visible; /* Allow border-radius to show */
     }
 
     .dynamic-table td::before {
@@ -2049,17 +2049,17 @@ select.valid:focus {
     .dynamic-table select {
         padding: 12px;
         width: 100%;
+        max-width: 100%; /* Constrain to parent width */
         min-width: 0; /* Prevent flex overflow */
         box-sizing: border-box;
         border-radius: var(--radius-sm); /* Ensure rounded corners on mobile */
-    }
-
-    /* iOS Safari date input - force rounded corners */
-    .dynamic-table input[type="date"] {
-        -webkit-appearance: none;
+        -webkit-appearance: none; /* Remove iOS native styling */
         -moz-appearance: none;
         appearance: none;
-        border-radius: var(--radius-sm) !important;
+    }
+
+    /* iOS Safari date input - ensure consistent styling */
+    .dynamic-table input[type="date"] {
         border: 2px solid var(--gray-200);
         background-color: var(--white);
     }

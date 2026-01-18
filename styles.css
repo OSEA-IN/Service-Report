@@ -2041,14 +2041,10 @@ select.valid:focus {
         flex: 1 1 100%;
     }
 
-    /* Second column (Responsibility) - half width */
-    .dynamic-table td:nth-child(2) {
-        flex: 1 1 calc(50% - 5px);
-    }
-
-    /* Third column (Target Date) - half width */
+    /* Second and third columns - equal half width side by side */
+    .dynamic-table td:nth-child(2),
     .dynamic-table td:nth-child(3) {
-        flex: 1 1 calc(50% - 5px);
+        flex: 0 0 calc(50% - 5px); /* Don't grow, don't shrink, exactly half */
     }
 
     /* Fourth column (Action buttons) - full width */

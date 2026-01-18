@@ -2030,12 +2030,10 @@ select.valid:focus {
     }
 
     .dynamic-table td {
-        display: flex;
-        flex-direction: column;
+        display: block;
         padding: 0;
         border: none;
-        width: 100%;
-        align-self: stretch; /* Stretch to full width of parent */
+        overflow: hidden; /* Prevent children from overflowing */
     }
 
     .dynamic-table td::before {
@@ -2051,7 +2049,7 @@ select.valid:focus {
     .dynamic-table select {
         padding: 12px;
         width: 100%;
-        max-width: 100%;
+        min-width: 0; /* Prevent flex overflow */
         box-sizing: border-box;
     }
 

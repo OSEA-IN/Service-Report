@@ -2021,6 +2021,7 @@ select.valid:focus {
     .dynamic-table tr {
         display: flex;
         flex-direction: column;
+        align-items: stretch; /* Force children to stretch full width */
         background: var(--white);
         padding: 14px;
         border-radius: var(--radius-md);
@@ -2029,10 +2030,12 @@ select.valid:focus {
     }
 
     .dynamic-table td {
-        display: block;
+        display: flex;
+        flex-direction: column;
         padding: 0;
         border: none;
-        width: 100%; /* Ensure td takes full width so inputs inside can be 100% */
+        width: 100%;
+        align-self: stretch; /* Stretch to full width of parent */
     }
 
     .dynamic-table td::before {

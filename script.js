@@ -1,5 +1,36 @@
 // OSEA Service Report Form - JavaScript
 
+// ==================== PASSWORD PROTECTION ====================
+const SITE_PASSWORD = 'osea@service';
+
+function checkPassword() {
+    const input = document.getElementById('password-input');
+    const error = document.getElementById('password-error');
+
+    if (input.value === SITE_PASSWORD) {
+        document.getElementById('password-overlay').classList.add('hidden');
+        sessionStorage.setItem('osea-authenticated', 'true');
+    } else {
+        error.textContent = 'Incorrect password';
+        input.value = '';
+        input.focus();
+    }
+}
+
+// Check on page load if already authenticated this session
+document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('osea-authenticated') === 'true') {
+        document.getElementById('password-overlay').classList.add('hidden');
+    }
+
+    // Allow Enter key to submit password
+    document.getElementById('password-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+});
+
 // Global variables
 let machineCount = 0;
 let navVisible = false; // Start hidden on mobile

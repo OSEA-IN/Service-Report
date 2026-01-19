@@ -2361,3 +2361,98 @@ select.valid:focus {
 .validation-error.visible {
     display: block;
 }
+
+/* ============================================
+   PASSWORD PROTECTION OVERLAY
+   ============================================ */
+.password-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 50%, var(--blue-800) 100%);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.password-overlay.hidden {
+    display: none;
+}
+
+.password-box {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    max-width: 360px;
+    width: 100%;
+}
+
+.password-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 16px;
+}
+
+.password-box h2 {
+    color: var(--brand-primary);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.password-box p {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.password-box input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-family: inherit;
+    text-align: center;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.password-box input:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(26, 82, 118, 0.12);
+}
+
+.password-box button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--blue-800) 100%);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.password-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 82, 118, 0.4);
+}
+
+.password-error {
+    color: var(--red-500);
+    font-size: 13px;
+    margin-top: 12px;
+    margin-bottom: 0;
+    min-height: 20px;
+}

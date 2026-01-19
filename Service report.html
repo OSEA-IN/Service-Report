@@ -8,6 +8,18 @@
 </head>
 <body>
 
+<!-- Password Protection Overlay -->
+<div id="password-overlay" class="password-overlay">
+    <div class="password-box">
+        <img src="OSEA_logo_transparent.png" alt="OSEA Logo" class="password-logo">
+        <h2>OSEA Service Report</h2>
+        <p>Enter password to access</p>
+        <input type="password" id="password-input" placeholder="Password" autocomplete="off">
+        <button id="password-submit" onclick="checkPassword()">Enter</button>
+        <p id="password-error" class="password-error"></p>
+    </div>
+</div>
+
 <!-- Navigation Sidebar -->
 <div id="nav-sidebar" class="nav-sidebar">
     <!-- Content populated by JS -->

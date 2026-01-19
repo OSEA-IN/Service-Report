@@ -1587,7 +1587,7 @@ function buildPDFHtml() {
             </div>
         </div>
 
-        <div class="report-title-bar">SERVICE REPORT</div>
+        <div class="report-title">SERVICE REPORT</div>
 
         <div class="report-meta">
             <div class="meta-left">Report No: <strong>${displayValue(document.getElementById('reportNo').textContent, 'Report No')}</strong></div>
@@ -1595,50 +1595,22 @@ function buildPDFHtml() {
         </div>
 
         <!-- CLIENT DETAILS Section -->
-        <div class="section-header">CLIENT DETAILS</div>
-        <div class="info-grid">
-            <div class="info-row">
-                <div class="info-label">Company Name</div>
-                <div class="info-value">${displayValue(document.getElementById('companyName').value, 'Company Name')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Location</div>
-                <div class="info-value">${displayValue(getLocation(), 'Location')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Contact Person</div>
-                <div class="info-value">${displayValue(getContactPerson(), 'Contact Person')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Mobile</div>
-                <div class="info-value">${displayValue(document.getElementById('contactMobile').value, 'Mobile')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Email</div>
-                <div class="info-value">${document.getElementById('contactEmail').value || '-'}</div>
-            </div>
-        </div>
+        <div class="section-header">Client Details</div>
+        <table class="info-table">
+            <tr><td class="label">Company</td><td class="value">${displayValue(document.getElementById('companyName').value, 'Company Name')}</td></tr>
+            <tr><td class="label">Location</td><td class="value">${displayValue(getLocation(), 'Location')}</td></tr>
+            <tr><td class="label">Contact Person</td><td class="value">${displayValue(getContactPerson(), 'Contact Person')}</td></tr>
+            <tr><td class="label">Phone/Email</td><td class="value">${displayValue(document.getElementById('contactMobile').value, 'Mobile')}${document.getElementById('contactEmail').value ? ' / ' + document.getElementById('contactEmail').value : ''}</td></tr>
+        </table>
 
         <!-- VISIT DETAILS Section -->
-        <div class="section-header">VISIT DETAILS</div>
-        <div class="info-grid">
-            <div class="info-row">
-                <div class="info-label">Visit Type</div>
-                <div class="info-value">${displayValue(getVisitType(), 'Visit Type')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">OSEA Representatives</div>
-                <div class="info-value">${displayValue(getEngineersDisplay(), 'Representatives')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Arrival Date</div>
-                <div class="info-value">${displayValue(formatDate(document.getElementById('arrivalDate').value), 'Arrival Date')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Departure Date</div>
-                <div class="info-value">${displayValue(formatDate(document.getElementById('departureDate').value), 'Departure Date')}</div>
-            </div>
-        </div>
+        <div class="section-header">Visit Details</div>
+        <table class="info-table">
+            <tr><td class="label">Visit Type</td><td class="value">${displayValue(getVisitType(), 'Visit Type')}</td></tr>
+            <tr><td class="label">Engineer(s)</td><td class="value">${displayValue(getEngineersDisplay(), 'Representatives')}</td></tr>
+            <tr><td class="label">Arrival Date</td><td class="value">${displayValue(formatDate(document.getElementById('arrivalDate').value), 'Arrival Date')}</td></tr>
+            <tr><td class="label">Departure Date</td><td class="value">${displayValue(formatDate(document.getElementById('departureDate').value), 'Departure Date')}</td></tr>
+        </table>
     `;
 
     // Add machines with gold/yellow headers
@@ -1658,12 +1630,13 @@ function buildPDFHtml() {
         html += `
             <div class="machine-section">
                 <div class="machine-header">Machine ${index + 1}: ${machineName}</div>
-                <div class="machine-specs">
-                    <span><strong>Serial:</strong> ${displayValue(serialNumber, 'Serial No')}</span>
-                    <span><strong>Make:</strong> ${displayValue(make, 'Make')}</span>
-                    <span><strong>Model:</strong> ${displayValue(model, 'Model')}</span>
-                    <span><strong>Year:</strong> ${displayValue(year, 'Year')}</span>
-                </div>
+                <table class="machine-specs-table">
+                    <tr>
+                        <td><strong>Machine</strong> ${displayValue(machineName, 'Name')}</td>
+                        <td><strong>Make</strong> ${displayValue(make, 'Make')}</td>
+                        <td><strong>Serial No</strong> ${displayValue(serialNumber, 'Serial')}</td>
+                    </tr>
+                </table>
         `;
 
         // Issue Reported
@@ -1909,61 +1882,58 @@ function previewPDF() {
                 .empty-field { color: #999; font-style: italic; }
 
                 /* Header */
-                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 15px; }
-                .header-left { display: flex; align-items: center; gap: 12px; }
-                .pdf-logo { width: 60px; height: auto; }
-                .header-company { }
-                .company-name { font-size: 14pt; font-weight: bold; color: #1a5276; }
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 20px; }
+                .header-left { display: flex; align-items: center; gap: 15px; }
+                .pdf-logo { width: 65px; height: auto; }
+                .company-name { font-size: 16pt; font-weight: bold; color: #1a5276; }
                 .company-tagline { font-size: 9pt; color: #666; font-style: italic; }
                 .header-right { text-align: right; }
-                .header-brand { font-size: 18pt; font-weight: bold; color: #1a5276; }
-                .header-contact { font-size: 8pt; color: #555; line-height: 1.4; }
+                .header-brand { font-size: 20pt; font-weight: bold; color: #1a5276; }
+                .header-contact { font-size: 8pt; color: #555; line-height: 1.5; }
 
-                /* Report Title and Meta */
-                .report-title-bar { background: #1a5276; color: white; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
-                .report-meta { display: flex; justify-content: space-between; padding: 8px 0; margin-bottom: 15px; font-size: 10pt; }
-                .meta-left { }
-                .meta-right { }
+                /* Report Title */
+                .report-title { text-align: center; font-size: 16pt; font-weight: bold; color: #1a5276; letter-spacing: 2px; margin: 25px 0 15px 0; }
+                .report-meta { display: flex; justify-content: space-between; padding: 10px 0; margin-bottom: 20px; font-size: 10pt; }
 
-                /* Section Headers (blue) */
-                .section-header { background: #1a5276; color: white; padding: 8px 12px; font-size: 10pt; font-weight: bold; margin: 15px 0 10px 0; }
+                /* Section Headers (blue) - full width */
+                .section-header { background: #1a5276; color: white; padding: 10px 15px; font-size: 10pt; font-weight: bold; margin: 25px -20px 15px -20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-                /* Info Grid */
-                .info-grid { border: 1px solid #ddd; margin-bottom: 10px; }
-                .info-row { display: flex; border-bottom: 1px solid #ddd; }
-                .info-row:last-child { border-bottom: none; }
-                .info-label { width: 150px; padding: 6px 10px; background: #f5f5f5; font-weight: 600; font-size: 9pt; color: #555; border-right: 1px solid #ddd; }
-                .info-value { flex: 1; padding: 6px 10px; font-size: 9pt; }
+                /* Info Table */
+                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                .info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 9pt; vertical-align: top; }
+                .info-table .label { background: #f5f5f5; font-weight: 600; color: #333; width: 160px; }
+                .info-table .value { background: white; }
 
                 /* Machine Sections (gold header) */
-                .machine-section { margin: 15px 0; page-break-inside: avoid; }
-                .machine-header { background: #d4a017; color: #1a1a1a; padding: 8px 12px; font-size: 11pt; font-weight: bold; }
-                .machine-specs { padding: 8px 12px; background: #f9f9f9; border: 1px solid #ddd; border-top: none; font-size: 9pt; display: flex; gap: 20px; flex-wrap: wrap; }
+                .machine-section { margin: 20px 0; }
+                .machine-header { background: #d4a017; color: #1a1a1a; padding: 10px 15px; font-size: 11pt; font-weight: bold; margin: 25px -20px 0 -20px; }
+                .machine-specs-table { width: 100%; border-collapse: collapse; border: 1px solid #ddd; border-top: none; }
+                .machine-specs-table td { padding: 8px 12px; border-right: 1px solid #ddd; font-size: 9pt; background: #f9f9f9; }
+                .machine-specs-table td:last-child { border-right: none; }
 
                 /* Subsections (gold labels) */
-                .subsection { margin: 10px 0; }
-                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 4px; text-transform: uppercase; }
-                .subsection-content { padding: 8px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+                .subsection { margin: 15px 0; }
+                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 5px; }
+                .subsection-content { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
 
                 /* Lists */
-                .pdf-list { margin: 4px 0 4px 20px; padding: 0; }
-                .pdf-list li { margin: 3px 0; }
+                .pdf-list { margin: 5px 0 5px 20px; padding: 0; }
+                .pdf-list li { margin: 4px 0; }
 
                 /* Tables */
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9pt; }
-                .pdf-table th { background: #1a5276; color: white; padding: 6px 10px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
-                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 9pt; }
+                .pdf-table th { background: #1a5276; color: white; padding: 8px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 8px 12px; border: 1px solid #ddd; }
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
 
                 /* Content Box */
-                .content-box { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+                .content-box { padding: 12px 15px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
 
                 /* Signatures */
-                .signatures-container { display: flex; justify-content: space-between; gap: 40px; margin-top: 20px; }
-                .signature-column { flex: 1; }
-                .signature-column-header { text-align: center; font-weight: bold; padding: 8px; background: #f0f0f0; border: 1px solid #ddd; margin-bottom: 15px; }
-                .signature-box { text-align: center; margin-bottom: 25px; }
-                .signature-line { border-bottom: 1px solid #333; height: 40px; margin: 0 10px 5px 10px; }
+                .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; }
+                .signature-column { flex: 1; border: 1px solid #ddd; padding: 15px; }
+                .signature-column-header { font-weight: bold; font-size: 10pt; margin-bottom: 20px; padding-bottom: 5px; border-bottom: 1px solid #333; }
+                .signature-box { margin-bottom: 30px; }
                 .signature-name { font-weight: 600; font-size: 10pt; }
                 .signature-designation { font-size: 8pt; color: #666; }
             </style>
@@ -2034,11 +2004,11 @@ function getPDFDocumentHtml(contentHtml) {
                 @media print {
                     body { margin: 0; padding: 0; background: white; }
                     .no-print { display: none !important; }
-                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; padding: 0; }
+                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; padding: 0 !important; margin: 0 !important; }
                     .pdf-footer-print { display: block !important; }
                 }
                 @page {
-                    margin: 12mm 15mm 18mm 15mm;
+                    margin: 20mm;
                     @bottom-center {
                         content: "OmSai Engineering & Automation (OSEA) | Service Report | Confidential";
                         font-size: 8pt;
@@ -2070,63 +2040,90 @@ function getPDFDocumentHtml(contentHtml) {
                 .empty-field { color: #999; font-style: italic; }
 
                 /* Header */
-                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 15px; }
-                .header-left { display: flex; align-items: center; gap: 12px; }
-                .pdf-logo { width: 60px; height: auto; }
-                .company-name { font-size: 14pt; font-weight: bold; color: #1a5276; }
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 20px; }
+                .header-left { display: flex; align-items: center; gap: 15px; }
+                .pdf-logo { width: 65px; height: auto; }
+                .company-name { font-size: 16pt; font-weight: bold; color: #1a5276; }
                 .company-tagline { font-size: 9pt; color: #666; font-style: italic; }
                 .header-right { text-align: right; }
-                .header-brand { font-size: 18pt; font-weight: bold; color: #1a5276; }
-                .header-contact { font-size: 8pt; color: #555; line-height: 1.4; }
+                .header-brand { font-size: 20pt; font-weight: bold; color: #1a5276; }
+                .header-contact { font-size: 8pt; color: #555; line-height: 1.5; }
 
-                /* Report Title and Meta */
-                .report-title-bar { background: #1a5276; color: white; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
-                .report-meta { display: flex; justify-content: space-between; padding: 8px 0; margin-bottom: 15px; font-size: 10pt; }
+                /* Report Title - not a bar, just styled text */
+                .report-title { text-align: center; font-size: 16pt; font-weight: bold; color: #1a5276; letter-spacing: 2px; margin: 25px 0 15px 0; }
 
-                /* Section Headers (blue) */
-                .section-header { background: #1a5276; color: white; padding: 8px 12px; font-size: 10pt; font-weight: bold; margin: 15px 0 10px 0; }
+                /* Report Meta */
+                .report-meta { display: flex; justify-content: space-between; padding: 10px 0; margin-bottom: 20px; font-size: 10pt; }
 
-                /* Info Grid */
-                .info-grid { border: 1px solid #ddd; margin-bottom: 10px; }
-                .info-row { display: flex; border-bottom: 1px solid #ddd; }
-                .info-row:last-child { border-bottom: none; }
-                .info-label { width: 150px; padding: 6px 10px; background: #f5f5f5; font-weight: 600; font-size: 9pt; color: #555; border-right: 1px solid #ddd; }
-                .info-value { flex: 1; padding: 6px 10px; font-size: 9pt; }
+                /* Section Headers (blue) - FULL WIDTH with negative margins */
+                .section-header {
+                    background: #1a5276;
+                    color: white;
+                    padding: 10px 15px;
+                    font-size: 10pt;
+                    font-weight: bold;
+                    margin: 25px -35px 15px -35px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                @media print {
+                    .section-header { margin: 25px 0 15px 0; }
+                }
 
-                /* Machine Sections (gold header) */
-                .machine-section { margin: 15px 0; page-break-inside: avoid; }
-                .machine-header { background: #d4a017; color: #1a1a1a; padding: 8px 12px; font-size: 11pt; font-weight: bold; }
-                .machine-specs { padding: 8px 12px; background: #f9f9f9; border: 1px solid #ddd; border-top: none; font-size: 9pt; display: flex; gap: 20px; flex-wrap: wrap; }
+                /* Info Table (replaces flexbox grid) */
+                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                .info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 9pt; vertical-align: top; }
+                .info-table .label { background: #f5f5f5; font-weight: 600; color: #333; width: 160px; }
+                .info-table .value { background: white; }
+
+                /* Machine Sections (gold header) - FULL WIDTH */
+                .machine-section { margin: 20px 0; page-break-inside: avoid; }
+                .machine-header {
+                    background: #d4a017;
+                    color: #1a1a1a;
+                    padding: 10px 15px;
+                    font-size: 11pt;
+                    font-weight: bold;
+                    margin: 25px -35px 0 -35px;
+                }
+                @media print {
+                    .machine-header { margin: 25px 0 0 0; }
+                }
+                .machine-specs-table { width: 100%; border-collapse: collapse; border: 1px solid #ddd; border-top: none; }
+                .machine-specs-table td { padding: 8px 12px; border-right: 1px solid #ddd; font-size: 9pt; background: #f9f9f9; }
+                .machine-specs-table td:last-child { border-right: none; }
 
                 /* Subsections (gold labels) */
-                .subsection { margin: 10px 0; page-break-inside: avoid; }
-                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 4px; text-transform: uppercase; }
-                .subsection-content { padding: 8px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+                .subsection { margin: 15px 0; page-break-inside: avoid; }
+                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 5px; }
+                .subsection-content { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
 
                 /* Lists */
-                .pdf-list { margin: 4px 0 4px 20px; padding: 0; orphans: 3; widows: 3; }
-                .pdf-list li { margin: 3px 0; }
+                .pdf-list { margin: 5px 0 5px 20px; padding: 0; orphans: 3; widows: 3; }
+                .pdf-list li { margin: 4px 0; }
 
                 /* Tables */
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9pt; page-break-inside: avoid; }
-                .pdf-table th { background: #1a5276; color: white; padding: 6px 10px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
-                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 9pt; page-break-inside: avoid; }
+                .pdf-table th { background: #1a5276; color: white; padding: 8px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 8px 12px; border: 1px solid #ddd; }
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
 
                 /* Content Box */
-                .content-box { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+                .content-box { padding: 12px 15px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
 
                 /* Signatures */
-                .signatures-container { display: flex; justify-content: space-between; gap: 40px; margin-top: 20px; page-break-inside: avoid; }
-                .signature-column { flex: 1; }
-                .signature-column-header { text-align: center; font-weight: bold; padding: 8px; background: #f0f0f0; border: 1px solid #ddd; margin-bottom: 15px; }
-                .signature-box { text-align: center; margin-bottom: 25px; page-break-inside: avoid; }
-                .signature-line { border-bottom: 1px solid #333; height: 40px; margin: 0 10px 5px 10px; }
+                .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; page-break-inside: avoid; }
+                .signature-column { flex: 1; border: 1px solid #ddd; padding: 15px; }
+                .signature-column-header { font-weight: bold; font-size: 10pt; margin-bottom: 20px; padding-bottom: 5px; border-bottom: 1px solid #333; }
+                .signature-box { margin-bottom: 30px; page-break-inside: avoid; }
+                .signature-field { margin-bottom: 12px; }
+                .signature-field-label { font-size: 9pt; font-weight: 600; }
+                .signature-field-line { border-bottom: 1px solid #333; height: 25px; margin-top: 3px; }
                 .signature-name { font-weight: 600; font-size: 10pt; }
                 .signature-designation { font-size: 8pt; color: #666; }
 
                 /* Print footer (fallback for browsers that don't support @page rules) */
-                .pdf-footer-print { display: none; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center; font-size: 8pt; color: #666; }
+                .pdf-footer-print { display: none; margin-top: 40px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; font-size: 8pt; color: #666; }
 
                 /* Action bar */
                 .back-bar {

@@ -37,32 +37,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Date validation: Departure cannot be before arrival
-    // When arrival changes, update departure if it's now before arrival
+    // Validation function to reuse
+    function validateDepartureDateNotBeforeArrival() {
+        const arrivalDate = document.getElementById('arrivalDate');
+        const departureDate = document.getElementById('departureDate');
+
+        if (arrivalDate.value && departureDate.value && departureDate.value < arrivalDate.value) {
+            departureDate.value = arrivalDate.value;
+            showStatus('Departure date cannot be before arrival date', 'error');
+        }
+        // Always update the min attribute
+        if (arrivalDate.value) {
+            departureDate.min = arrivalDate.value;
+        }
+    }
+
+    // When arrival changes, update departure min and validate
     document.getElementById('arrivalDate').addEventListener('change', function() {
         const departureDate = document.getElementById('departureDate');
         if (!departureDate.value) {
             departureDate.value = this.value;
-        } else if (departureDate.value < this.value) {
-            departureDate.value = this.value;
-            showStatus('Departure date updated to match arrival (cannot be earlier)', 'error');
         }
+        validateDepartureDateNotBeforeArrival();
     });
 
-    // When departure changes, prevent it from being before arrival
+    // When departure changes (calendar selection), validate
     document.getElementById('departureDate').addEventListener('change', function() {
         const arrivalDate = document.getElementById('arrivalDate');
         if (!arrivalDate.value) {
             arrivalDate.value = this.value;
-        } else if (this.value < arrivalDate.value) {
-            // Departure cannot be before arrival - reset and warn
-            this.value = arrivalDate.value;
-            showStatus('Departure date cannot be before arrival date', 'error');
         }
+        validateDepartureDateNotBeforeArrival();
     });
 
-    // Also set min attribute on departure to prevent calendar from showing earlier dates
-    document.getElementById('arrivalDate').addEventListener('change', function() {
-        document.getElementById('departureDate').min = this.value;
+    // When departure loses focus (catches typed values), validate
+    document.getElementById('departureDate').addEventListener('blur', validateDepartureDateNotBeforeArrival);
+
+    // Also validate on input for immediate feedback while typing
+    document.getElementById('departureDate').addEventListener('input', function() {
+        // Only validate if it's a complete date (10 chars: YYYY-MM-DD)
+        if (this.value.length === 10) {
+            validateDepartureDateNotBeforeArrival();
+        }
     });
 
     // Initialize representatives (add empty OSEA rep if none from engineers)
@@ -1543,6 +1559,7 @@ function loadDraft() {
 // ==================== PDF GENERATION ====================
 
 // Helper function to build the PDF HTML content
+// Redesigned to match professional template format
 function buildPDFHtml() {
     const logoBase64 = OSEA_LOGO_BASE64;
 
@@ -1552,44 +1569,79 @@ function buildPDFHtml() {
         return `<span class="empty-field">[${fieldName || 'Not specified'}]</span>`;
     };
 
+    // Header with logo, company name, and contact info
     let html = `
         <div class="pdf-header">
-            <img src="${logoBase64}" alt="OSEA Logo" class="pdf-logo">
-            <div class="pdf-header-text">
-                <h1>SERVICE REPORT</h1>
-                <p>OmSai Engineering & Automation</p>
+            <div class="header-left">
+                <img src="${logoBase64}" alt="OSEA Logo" class="pdf-logo">
+                <div class="header-company">
+                    <div class="company-name">OmSai Engineering & Automation</div>
+                    <div class="company-tagline">Extrusion Lamination Specialists</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-brand">OSEA</div>
+                <div class="header-contact">Hyderabad, India</div>
+                <div class="header-contact">Email: sunil.osea@gmail.com</div>
+                <div class="header-contact">Contact: Mr. Sunil Raut</div>
             </div>
         </div>
 
-        <table class="pdf-info-table">
-            <tr>
-                <td><strong>Report No:</strong> ${displayValue(document.getElementById('reportNo').textContent, 'Report No')}</td>
-                <td><strong>Date:</strong> ${displayValue(formatDate(document.getElementById('reportDate').value), 'Date')}</td>
-            </tr>
-            <tr>
-                <td><strong>Client:</strong> ${displayValue(document.getElementById('companyName').value, 'Company Name')}</td>
-                <td><strong>Location:</strong> ${displayValue(getLocation(), 'Location')}</td>
-            </tr>
-            <tr>
-                <td><strong>Contact:</strong> ${displayValue(getContactPerson(), 'Contact Person')}</td>
-                <td><strong>Mobile:</strong> ${displayValue(document.getElementById('contactMobile').value, 'Mobile')}</td>
-            </tr>
-            <tr>
-                <td><strong>Email:</strong> ${document.getElementById('contactEmail').value || '-'}</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td><strong>Visit Type:</strong> ${displayValue(getVisitType(), 'Visit Type')}</td>
-                <td><strong>Representatives:</strong> ${displayValue(getEngineersDisplay(), 'Representatives')}</td>
-            </tr>
-            <tr>
-                <td><strong>Arrival:</strong> ${displayValue(formatDate(document.getElementById('arrivalDate').value), 'Arrival Date')}</td>
-                <td><strong>Departure:</strong> ${displayValue(formatDate(document.getElementById('departureDate').value), 'Departure Date')}</td>
-            </tr>
-        </table>
+        <div class="report-title-bar">SERVICE REPORT</div>
+
+        <div class="report-meta">
+            <div class="meta-left">Report No: <strong>${displayValue(document.getElementById('reportNo').textContent, 'Report No')}</strong></div>
+            <div class="meta-right">Date: <strong>${displayValue(formatDate(document.getElementById('reportDate').value), 'Date')}</strong></div>
+        </div>
+
+        <!-- CLIENT DETAILS Section -->
+        <div class="section-header">CLIENT DETAILS</div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Company Name</div>
+                <div class="info-value">${displayValue(document.getElementById('companyName').value, 'Company Name')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Location</div>
+                <div class="info-value">${displayValue(getLocation(), 'Location')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Contact Person</div>
+                <div class="info-value">${displayValue(getContactPerson(), 'Contact Person')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Mobile</div>
+                <div class="info-value">${displayValue(document.getElementById('contactMobile').value, 'Mobile')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Email</div>
+                <div class="info-value">${document.getElementById('contactEmail').value || '-'}</div>
+            </div>
+        </div>
+
+        <!-- VISIT DETAILS Section -->
+        <div class="section-header">VISIT DETAILS</div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Visit Type</div>
+                <div class="info-value">${displayValue(getVisitType(), 'Visit Type')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">OSEA Representatives</div>
+                <div class="info-value">${displayValue(getEngineersDisplay(), 'Representatives')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Arrival Date</div>
+                <div class="info-value">${displayValue(formatDate(document.getElementById('arrivalDate').value), 'Arrival Date')}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Departure Date</div>
+                <div class="info-value">${displayValue(formatDate(document.getElementById('departureDate').value), 'Departure Date')}</div>
+            </div>
+        </div>
     `;
 
-    // Add machines
+    // Add machines with gold/yellow headers
     const machines = document.querySelectorAll('.machine-card');
     machines.forEach((machine, index) => {
         const machineName = machine.querySelector('.machine-name').value || `Machine ${index + 1}`;
@@ -1604,23 +1656,21 @@ function buildPDFHtml() {
         const status = machine.querySelector('.machine-status')?.value || '';
 
         html += `
-            <div class="pdf-section">
-                <div class="pdf-section-title">Machine ${index + 1}: ${machineName}</div>
-                <table class="pdf-info-table">
-                    <tr>
-                        <td><strong>Serial:</strong> ${displayValue(serialNumber, 'Serial No')}</td>
-                        <td><strong>Make:</strong> ${displayValue(make, 'Make')}</td>
-                        <td><strong>Model:</strong> ${displayValue(model, 'Model')}</td>
-                        <td><strong>Year:</strong> ${displayValue(year, 'Year')}</td>
-                    </tr>
-                </table>
+            <div class="machine-section">
+                <div class="machine-header">Machine ${index + 1}: ${machineName}</div>
+                <div class="machine-specs">
+                    <span><strong>Serial:</strong> ${displayValue(serialNumber, 'Serial No')}</span>
+                    <span><strong>Make:</strong> ${displayValue(make, 'Make')}</span>
+                    <span><strong>Model:</strong> ${displayValue(model, 'Model')}</span>
+                    <span><strong>Year:</strong> ${displayValue(year, 'Year')}</span>
+                </div>
         `;
 
-        // Problem Reported
+        // Issue Reported
         html += `
-            <div class="pdf-subsection">
-                <strong>Problem Reported:</strong>
-                <p>${displayValue(problemReported, 'Problem Description')}</p>
+            <div class="subsection">
+                <div class="subsection-label">Issue Reported</div>
+                <div class="subsection-content">${displayValue(problemReported, 'Problem Description')}</div>
             </div>
         `;
 
@@ -1628,25 +1678,29 @@ function buildPDFHtml() {
         const observations = machine.querySelectorAll('.observations-list .list-item input');
         const obsValues = Array.from(observations).map(i => i.value).filter(v => v.trim());
         html += `
-            <div class="pdf-subsection">
-                <strong>Observations:</strong>
-                ${obsValues.length > 0
-                    ? `<ol class="pdf-list">${obsValues.map(v => `<li>${v}</li>`).join('')}</ol>`
-                    : `<p><span class="empty-field">[No observations recorded]</span></p>`
-                }
+            <div class="subsection">
+                <div class="subsection-label">Observations</div>
+                <div class="subsection-content">
+                    ${obsValues.length > 0
+                        ? `<ol class="pdf-list">${obsValues.map(v => `<li>${v}</li>`).join('')}</ol>`
+                        : `<span class="empty-field">[No observations recorded]</span>`
+                    }
+                </div>
             </div>
         `;
 
-        // Activities
+        // Activities/Work Performed
         const activities = machine.querySelectorAll('.activities-list .list-item input');
         const actValues = Array.from(activities).map(i => i.value).filter(v => v.trim());
         html += `
-            <div class="pdf-subsection">
-                <strong>Activities Performed:</strong>
-                ${actValues.length > 0
-                    ? `<ol class="pdf-list">${actValues.map(v => `<li>${v}</li>`).join('')}</ol>`
-                    : `<p><span class="empty-field">[No activities recorded]</span></p>`
-                }
+            <div class="subsection">
+                <div class="subsection-label">Work Performed</div>
+                <div class="subsection-content">
+                    ${actValues.length > 0
+                        ? `<ol class="pdf-list">${actValues.map(v => `<li>${v}</li>`).join('')}</ol>`
+                        : `<span class="empty-field">[No activities recorded]</span>`
+                    }
+                </div>
             </div>
         `;
 
@@ -1654,19 +1708,24 @@ function buildPDFHtml() {
         const conclusions = machine.querySelectorAll('.conclusions-list .list-item input');
         const conValues = Array.from(conclusions).map(i => i.value).filter(v => v.trim());
         html += `
-            <div class="pdf-subsection">
-                <strong>Conclusions:</strong>
-                ${conValues.length > 0
-                    ? `<ul class="pdf-list">${conValues.map(v => `<li>${v}</li>`).join('')}</ul>`
-                    : `<p><span class="empty-field">[No conclusions recorded]</span></p>`
-                }
+            <div class="subsection">
+                <div class="subsection-label">Conclusions</div>
+                <div class="subsection-content">
+                    ${conValues.length > 0
+                        ? `<ul class="pdf-list">${conValues.map(v => `<li>${v}</li>`).join('')}</ul>`
+                        : `<span class="empty-field">[No conclusions recorded]</span>`
+                    }
+                </div>
             </div>
         `;
 
+        // Current Status
         html += `
-            <div class="pdf-subsection">
-                <strong>Current Status:</strong> ${displayValue(status, 'Status')}
-                ${statusNotes ? `<p>${statusNotes}</p>` : ''}
+            <div class="subsection">
+                <div class="subsection-label">Current Status</div>
+                <div class="subsection-content">
+                    ${displayValue(status, 'Status')}${statusNotes ? ` - ${statusNotes}` : ''}
+                </div>
             </div>
         `;
 
@@ -1684,15 +1743,17 @@ function buildPDFHtml() {
         }).filter(p => p.action.trim());
 
         html += `
-            <div class="pdf-subsection">
-                <strong>Pending Actions:</strong>
-                ${pendingData.length > 0
-                    ? `<table class="pdf-table">
-                        <tr><th>Action</th><th>Responsibility</th><th>Target Date</th></tr>
-                        ${pendingData.map(p => `<tr><td>${p.action}</td><td>${displayValue(p.responsibility, 'Responsibility')}</td><td>${displayValue(p.targetDate, 'Date')}</td></tr>`).join('')}
-                       </table>`
-                    : `<p><span class="empty-field">[No pending actions]</span></p>`
-                }
+            <div class="subsection">
+                <div class="subsection-label">Pending Actions</div>
+                <div class="subsection-content">
+                    ${pendingData.length > 0
+                        ? `<table class="pdf-table">
+                            <tr><th>Action</th><th>Responsibility</th><th>Target Date</th></tr>
+                            ${pendingData.map(p => `<tr><td>${p.action}</td><td>${displayValue(p.responsibility, 'Responsibility')}</td><td>${displayValue(p.targetDate, 'Date')}</td></tr>`).join('')}
+                           </table>`
+                        : `<span class="empty-field">[No pending actions]</span>`
+                    }
+                </div>
             </div>
         `;
 
@@ -1708,15 +1769,17 @@ function buildPDFHtml() {
         }).filter(p => p.description.trim());
 
         html += `
-            <div class="pdf-subsection">
-                <strong>Parts/Materials Required:</strong>
-                ${partsData.length > 0
-                    ? `<table class="pdf-table">
-                        <tr><th>Description</th><th>Qty</th><th>Remarks</th></tr>
-                        ${partsData.map(p => `<tr><td>${p.description}</td><td>${displayValue(p.qty, 'Qty')}</td><td>${p.remarks || '-'}</td></tr>`).join('')}
-                       </table>`
-                    : `<p><span class="empty-field">[No parts required]</span></p>`
-                }
+            <div class="subsection">
+                <div class="subsection-label">Parts/Materials Required</div>
+                <div class="subsection-content">
+                    ${partsData.length > 0
+                        ? `<table class="pdf-table">
+                            <tr><th>Description</th><th>Qty</th><th>Remarks</th></tr>
+                            ${partsData.map(p => `<tr><td>${p.description}</td><td>${displayValue(p.qty, 'Qty')}</td><td>${p.remarks || '-'}</td></tr>`).join('')}
+                           </table>`
+                        : `<span class="empty-field">[No parts required]</span>`
+                    }
+                </div>
             </div>
         `;
 
@@ -1726,74 +1789,72 @@ function buildPDFHtml() {
     // General Recommendations
     const recommendations = document.getElementById('generalRecommendations').value;
     html += `
-        <div class="pdf-section">
-            <div class="pdf-section-title">General Recommendations</div>
-            <p>${displayValue(recommendations, 'No recommendations')}</p>
+        <div class="section-header">GENERAL RECOMMENDATIONS</div>
+        <div class="content-box">
+            ${displayValue(recommendations, 'No recommendations')}
         </div>
     `;
 
-    // Signatures
+    // Signatures Section
     const oseaReps = getOseaReps();
     const clientReps = getClientReps();
 
-    html += `<div class="pdf-signatures">`;
+    html += `
+        <div class="section-header">SIGNATURES</div>
+        <div class="signatures-container">
+    `;
 
     // OSEA Representatives
-    html += `<div class="pdf-signature-column">
-        <p class="sig-header"><strong>For OSEA</strong></p>`;
+    html += `<div class="signature-column">
+        <div class="signature-column-header">For OSEA</div>`;
 
     if (oseaReps.length > 0) {
         oseaReps.forEach(rep => {
             html += `
-                <div class="pdf-signature-box">
+                <div class="signature-box">
                     <div class="signature-line"></div>
-                    <p class="sig-name">${rep.title} ${rep.name}</p>
-                    <p class="sig-designation">${rep.designation || 'Service Engineer'}</p>
+                    <div class="signature-name">${rep.title} ${rep.name}</div>
+                    <div class="signature-designation">${rep.designation || 'Service Engineer'}</div>
                 </div>
             `;
         });
     } else {
         html += `
-            <div class="pdf-signature-box">
+            <div class="signature-box">
                 <div class="signature-line"></div>
-                <p class="sig-name"><span class="empty-field">[Name]</span></p>
-                <p class="sig-designation"><span class="empty-field">[Designation]</span></p>
+                <div class="signature-name"><span class="empty-field">[Name]</span></div>
+                <div class="signature-designation"><span class="empty-field">[Designation]</span></div>
             </div>
         `;
     }
     html += `</div>`;
 
     // Client Representatives
-    html += `<div class="pdf-signature-column">
-        <p class="sig-header"><strong>For Client</strong></p>`;
+    html += `<div class="signature-column">
+        <div class="signature-column-header">For Client</div>`;
 
     if (clientReps.length > 0) {
         clientReps.forEach(rep => {
             html += `
-                <div class="pdf-signature-box">
+                <div class="signature-box">
                     <div class="signature-line"></div>
-                    <p class="sig-name">${rep.title} ${rep.name}</p>
-                    <p class="sig-designation">${rep.designation || ''}</p>
+                    <div class="signature-name">${rep.title} ${rep.name}</div>
+                    <div class="signature-designation">${rep.designation || ''}</div>
                 </div>
             `;
         });
     } else {
         html += `
-            <div class="pdf-signature-box">
+            <div class="signature-box">
                 <div class="signature-line"></div>
-                <p class="sig-name"><span class="empty-field">[Name]</span></p>
-                <p class="sig-designation"><span class="empty-field">[Designation]</span></p>
+                <div class="signature-name"><span class="empty-field">[Name]</span></div>
+                <div class="signature-designation"><span class="empty-field">[Designation]</span></div>
             </div>
         `;
     }
     html += `</div>`;
 
-    html += `</div>
-
-        <div class="pdf-footer">
-            <p>OmSai Engineering & Automation | Service Report</p>
-        </div>
-    `;
+    html += `</div>`; // End signatures-container
 
     return html;
 }
@@ -1841,36 +1902,70 @@ function previewPDF() {
 
     const html = buildPDFHtml();
 
-    // Add styles for preview
+    // Add styles for preview - matches professional template design
     previewContent.innerHTML = `
-        <div class="pdf-container" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:11pt;line-height:1.4;color:#333;">
+        <div class="pdf-container" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;font-size:10pt;line-height:1.5;color:#333;">
             <style>
                 .empty-field { color: #999; font-style: italic; }
-                .pdf-header { display: flex; align-items: center; gap: 20px; border-bottom: 3px solid #d4a017; padding-bottom: 15px; margin-bottom: 20px; }
-                .pdf-logo { width: 80px; height: auto; }
-                .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
-                .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
-                .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 20px 0; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-                .pdf-section:last-of-type { border-bottom: none; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
-                .pdf-subsection { margin: 12px 0; }
-                .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 8px 0 8px 25px; }
-                .pdf-list li { margin: 4px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
-                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
+
+                /* Header */
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 15px; }
+                .header-left { display: flex; align-items: center; gap: 12px; }
+                .pdf-logo { width: 60px; height: auto; }
+                .header-company { }
+                .company-name { font-size: 14pt; font-weight: bold; color: #1a5276; }
+                .company-tagline { font-size: 9pt; color: #666; font-style: italic; }
+                .header-right { text-align: right; }
+                .header-brand { font-size: 18pt; font-weight: bold; color: #1a5276; }
+                .header-contact { font-size: 8pt; color: #555; line-height: 1.4; }
+
+                /* Report Title and Meta */
+                .report-title-bar { background: #1a5276; color: white; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
+                .report-meta { display: flex; justify-content: space-between; padding: 8px 0; margin-bottom: 15px; font-size: 10pt; }
+                .meta-left { }
+                .meta-right { }
+
+                /* Section Headers (blue) */
+                .section-header { background: #1a5276; color: white; padding: 8px 12px; font-size: 10pt; font-weight: bold; margin: 15px 0 10px 0; }
+
+                /* Info Grid */
+                .info-grid { border: 1px solid #ddd; margin-bottom: 10px; }
+                .info-row { display: flex; border-bottom: 1px solid #ddd; }
+                .info-row:last-child { border-bottom: none; }
+                .info-label { width: 150px; padding: 6px 10px; background: #f5f5f5; font-weight: 600; font-size: 9pt; color: #555; border-right: 1px solid #ddd; }
+                .info-value { flex: 1; padding: 6px 10px; font-size: 9pt; }
+
+                /* Machine Sections (gold header) */
+                .machine-section { margin: 15px 0; page-break-inside: avoid; }
+                .machine-header { background: #d4a017; color: #1a1a1a; padding: 8px 12px; font-size: 11pt; font-weight: bold; }
+                .machine-specs { padding: 8px 12px; background: #f9f9f9; border: 1px solid #ddd; border-top: none; font-size: 9pt; display: flex; gap: 20px; flex-wrap: wrap; }
+
+                /* Subsections (gold labels) */
+                .subsection { margin: 10px 0; }
+                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 4px; text-transform: uppercase; }
+                .subsection-content { padding: 8px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+
+                /* Lists */
+                .pdf-list { margin: 4px 0 4px 20px; padding: 0; }
+                .pdf-list li { margin: 3px 0; }
+
+                /* Tables */
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9pt; }
+                .pdf-table th { background: #1a5276; color: white; padding: 6px 10px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; gap: 40px; }
-                .pdf-signature-column { flex: 1; }
-                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
-                .pdf-signature-box { text-align: center; margin-bottom: 30px; }
-                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
-                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
-                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
+
+                /* Content Box */
+                .content-box { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+
+                /* Signatures */
+                .signatures-container { display: flex; justify-content: space-between; gap: 40px; margin-top: 20px; }
+                .signature-column { flex: 1; }
+                .signature-column-header { text-align: center; font-weight: bold; padding: 8px; background: #f0f0f0; border: 1px solid #ddd; margin-bottom: 15px; }
+                .signature-box { text-align: center; margin-bottom: 25px; }
+                .signature-line { border-bottom: 1px solid #333; height: 40px; margin: 0 10px 5px 10px; }
+                .signature-name { font-weight: 600; font-size: 10pt; }
+                .signature-designation { font-size: 8pt; color: #666; }
             </style>
             ${html}
         </div>
@@ -1906,114 +2001,7 @@ function generatePDF() {
         return;
     }
 
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>OSEA Service Report</title>
-            <style>
-                @media print {
-                    body { margin: 0; padding: 0; background: white; }
-                    .no-print { display: none !important; }
-                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; }
-                }
-                @page {
-                    margin: 15mm;
-                }
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    font-size: 11pt;
-                    line-height: 1.4;
-                    color: #333;
-                    background: #f0f0f0;
-                    padding: 20px;
-                    margin: 0;
-                }
-                .pdf-wrapper {
-                    background: white;
-                    border: 1px solid #ccc;
-                    padding: 30px 40px;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                }
-                .empty-field { color: #999; font-style: italic; }
-                .pdf-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                    border-bottom: 3px solid #d4a017;
-                    padding-bottom: 15px;
-                    margin-bottom: 20px;
-                }
-                .pdf-logo { width: 80px; height: auto; }
-                .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
-                .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
-                .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 20px 0; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-                .pdf-section:last-of-type { border-bottom: none; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
-                .pdf-subsection { margin: 12px 0; page-break-inside: avoid; }
-                .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 8px 0 8px 25px; orphans: 3; widows: 3; }
-                .pdf-list li { margin: 4px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; page-break-inside: avoid; }
-                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
-                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
-                .pdf-table tr:nth-child(even) { background: #f8f9fa; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; page-break-inside: avoid; gap: 40px; }
-                .pdf-signature-column { flex: 1; }
-                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
-                .pdf-signature-box { text-align: center; margin-bottom: 30px; page-break-inside: avoid; }
-                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
-                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
-                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
-                .back-bar {
-                    background: #1a5276;
-                    padding: 12px 20px;
-                    text-align: center;
-                    position: sticky;
-                    top: 0;
-                    z-index: 100;
-                }
-                .back-btn {
-                    background: #d4a017;
-                    color: #1a1a1a;
-                    border: none;
-                    padding: 10px 25px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-right: 10px;
-                }
-                .back-btn:hover { background: #e6b422; }
-                .print-btn {
-                    background: #27ae60;
-                    color: white;
-                    border: none;
-                    padding: 10px 25px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    border-radius: 6px;
-                    cursor: pointer;
-                }
-                .print-btn:hover { background: #219a52; }
-            </style>
-        </head>
-        <body>
-            <div class="back-bar no-print">
-                <button class="back-btn" onclick="window.close()">← Back to Form</button>
-                <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
-            </div>
-            <div class="pdf-wrapper">
-                ${html}
-            </div>
-        </body>
-        </html>
-    `);
+    printWindow.document.write(getPDFDocumentHtml(html));
     printWindow.document.close();
 
     showStatus('Report opened in new tab', 'success');
@@ -2030,7 +2018,14 @@ function writePDFToWindow(printWindow) {
 
     // Clear the loading message and write the actual PDF content
     printWindow.document.open();
-    printWindow.document.write(`
+    printWindow.document.write(getPDFDocumentHtml(html));
+    printWindow.document.close();
+}
+
+// Shared function to generate the full PDF document HTML with styles
+// Matches professional template design with header, gold machine sections, page numbers
+function getPDFDocumentHtml(contentHtml) {
+    return `
         <!DOCTYPE html>
         <html>
         <head>
@@ -2039,15 +2034,26 @@ function writePDFToWindow(printWindow) {
                 @media print {
                     body { margin: 0; padding: 0; background: white; }
                     .no-print { display: none !important; }
-                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; }
+                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; padding: 0; }
+                    .pdf-footer-print { display: block !important; }
                 }
                 @page {
-                    margin: 15mm;
+                    margin: 12mm 15mm 18mm 15mm;
+                    @bottom-center {
+                        content: "OmSai Engineering & Automation (OSEA) | Service Report | Confidential";
+                        font-size: 8pt;
+                        color: #666;
+                    }
+                    @bottom-right {
+                        content: counter(page) "/" counter(pages);
+                        font-size: 8pt;
+                        color: #666;
+                    }
                 }
                 body {
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    font-size: 11pt;
-                    line-height: 1.4;
+                    font-size: 10pt;
+                    line-height: 1.5;
                     color: #333;
                     background: #f0f0f0;
                     padding: 20px;
@@ -2056,44 +2062,73 @@ function writePDFToWindow(printWindow) {
                 .pdf-wrapper {
                     background: white;
                     border: 1px solid #ccc;
-                    padding: 30px 40px;
+                    padding: 25px 35px;
                     max-width: 800px;
                     margin: 0 auto;
                     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }
                 .empty-field { color: #999; font-style: italic; }
-                .pdf-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                    border-bottom: 3px solid #d4a017;
-                    padding-bottom: 15px;
-                    margin-bottom: 20px;
-                }
-                .pdf-logo { width: 80px; height: auto; }
-                .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
-                .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
-                .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 20px 0; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-                .pdf-section:last-of-type { border-bottom: none; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
-                .pdf-subsection { margin: 12px 0; page-break-inside: avoid; }
-                .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 8px 0 8px 25px; orphans: 3; widows: 3; }
-                .pdf-list li { margin: 4px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; page-break-inside: avoid; }
-                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
-                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
+
+                /* Header */
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 15px; }
+                .header-left { display: flex; align-items: center; gap: 12px; }
+                .pdf-logo { width: 60px; height: auto; }
+                .company-name { font-size: 14pt; font-weight: bold; color: #1a5276; }
+                .company-tagline { font-size: 9pt; color: #666; font-style: italic; }
+                .header-right { text-align: right; }
+                .header-brand { font-size: 18pt; font-weight: bold; color: #1a5276; }
+                .header-contact { font-size: 8pt; color: #555; line-height: 1.4; }
+
+                /* Report Title and Meta */
+                .report-title-bar { background: #1a5276; color: white; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
+                .report-meta { display: flex; justify-content: space-between; padding: 8px 0; margin-bottom: 15px; font-size: 10pt; }
+
+                /* Section Headers (blue) */
+                .section-header { background: #1a5276; color: white; padding: 8px 12px; font-size: 10pt; font-weight: bold; margin: 15px 0 10px 0; }
+
+                /* Info Grid */
+                .info-grid { border: 1px solid #ddd; margin-bottom: 10px; }
+                .info-row { display: flex; border-bottom: 1px solid #ddd; }
+                .info-row:last-child { border-bottom: none; }
+                .info-label { width: 150px; padding: 6px 10px; background: #f5f5f5; font-weight: 600; font-size: 9pt; color: #555; border-right: 1px solid #ddd; }
+                .info-value { flex: 1; padding: 6px 10px; font-size: 9pt; }
+
+                /* Machine Sections (gold header) */
+                .machine-section { margin: 15px 0; page-break-inside: avoid; }
+                .machine-header { background: #d4a017; color: #1a1a1a; padding: 8px 12px; font-size: 11pt; font-weight: bold; }
+                .machine-specs { padding: 8px 12px; background: #f9f9f9; border: 1px solid #ddd; border-top: none; font-size: 9pt; display: flex; gap: 20px; flex-wrap: wrap; }
+
+                /* Subsections (gold labels) */
+                .subsection { margin: 10px 0; page-break-inside: avoid; }
+                .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 4px; text-transform: uppercase; }
+                .subsection-content { padding: 8px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+
+                /* Lists */
+                .pdf-list { margin: 4px 0 4px 20px; padding: 0; orphans: 3; widows: 3; }
+                .pdf-list li { margin: 3px 0; }
+
+                /* Tables */
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 9pt; page-break-inside: avoid; }
+                .pdf-table th { background: #1a5276; color: white; padding: 6px 10px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; page-break-inside: avoid; gap: 40px; }
-                .pdf-signature-column { flex: 1; }
-                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
-                .pdf-signature-box { text-align: center; margin-bottom: 30px; page-break-inside: avoid; }
-                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
-                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
-                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
+
+                /* Content Box */
+                .content-box { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+
+                /* Signatures */
+                .signatures-container { display: flex; justify-content: space-between; gap: 40px; margin-top: 20px; page-break-inside: avoid; }
+                .signature-column { flex: 1; }
+                .signature-column-header { text-align: center; font-weight: bold; padding: 8px; background: #f0f0f0; border: 1px solid #ddd; margin-bottom: 15px; }
+                .signature-box { text-align: center; margin-bottom: 25px; page-break-inside: avoid; }
+                .signature-line { border-bottom: 1px solid #333; height: 40px; margin: 0 10px 5px 10px; }
+                .signature-name { font-weight: 600; font-size: 10pt; }
+                .signature-designation { font-size: 8pt; color: #666; }
+
+                /* Print footer (fallback for browsers that don't support @page rules) */
+                .pdf-footer-print { display: none; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center; font-size: 8pt; color: #666; }
+
+                /* Action bar */
                 .back-bar {
                     background: #1a5276;
                     padding: 12px 20px;
@@ -2133,12 +2168,12 @@ function writePDFToWindow(printWindow) {
                 <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
             </div>
             <div class="pdf-wrapper">
-                ${html}
+                ${contentHtml}
+                <div class="pdf-footer-print">OmSai Engineering & Automation (OSEA) | Service Report | Confidential</div>
             </div>
         </body>
         </html>
-    `);
-    printWindow.document.close();
+    `;
 }
 
 // ============================================================================

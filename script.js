@@ -1630,12 +1630,10 @@ function buildPDFHtml() {
         html += `
             <div class="machine-section">
                 <div class="machine-header">Machine ${index + 1}: ${machineName}</div>
-                <table class="machine-specs-table">
-                    <tr>
-                        <td><strong>Machine</strong> ${displayValue(machineName, 'Name')}</td>
-                        <td><strong>Make</strong> ${displayValue(make, 'Make')}</td>
-                        <td><strong>Serial No</strong> ${displayValue(serialNumber, 'Serial')}</td>
-                    </tr>
+                <table class="info-table">
+                    <tr><td class="label">Machine</td><td class="value">${displayValue(machineName, 'Name')}</td></tr>
+                    <tr><td class="label">Make</td><td class="value">${displayValue(make, 'Make')}</td></tr>
+                    <tr><td class="label">Serial No</td><td class="value">${displayValue(serialNumber, 'Serial')}</td></tr>
                 </table>
         `;
 
@@ -1785,18 +1783,20 @@ function buildPDFHtml() {
         oseaReps.forEach(rep => {
             html += `
                 <div class="signature-box">
-                    <div class="signature-line"></div>
-                    <div class="signature-name">${rep.title} ${rep.name}</div>
-                    <div class="signature-designation">${rep.designation || 'Service Engineer'}</div>
+                    <div class="signature-field"><span class="signature-label">Name:</span><span class="signature-value">${rep.title} ${rep.name}</span></div>
+                    <div class="signature-field"><span class="signature-label">Designation:</span><span class="signature-value">${rep.designation || 'Service Engineer'}</span></div>
+                    <div class="signature-field"><span class="signature-label">Sign:</span><span class="signature-underline"></span></div>
+                    <div class="signature-field"><span class="signature-label">Date:</span><span class="signature-underline"></span></div>
                 </div>
             `;
         });
     } else {
         html += `
             <div class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-name"><span class="empty-field">[Name]</span></div>
-                <div class="signature-designation"><span class="empty-field">[Designation]</span></div>
+                <div class="signature-field"><span class="signature-label">Name:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Designation:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Sign:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Date:</span><span class="signature-underline"></span></div>
             </div>
         `;
     }
@@ -1810,18 +1810,20 @@ function buildPDFHtml() {
         clientReps.forEach(rep => {
             html += `
                 <div class="signature-box">
-                    <div class="signature-line"></div>
-                    <div class="signature-name">${rep.title} ${rep.name}</div>
-                    <div class="signature-designation">${rep.designation || ''}</div>
+                    <div class="signature-field"><span class="signature-label">Name:</span><span class="signature-value">${rep.title} ${rep.name}</span></div>
+                    <div class="signature-field"><span class="signature-label">Designation:</span><span class="signature-value">${rep.designation || ''}</span></div>
+                    <div class="signature-field"><span class="signature-label">Sign:</span><span class="signature-underline"></span></div>
+                    <div class="signature-field"><span class="signature-label">Date:</span><span class="signature-underline"></span></div>
                 </div>
             `;
         });
     } else {
         html += `
             <div class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-name"><span class="empty-field">[Name]</span></div>
-                <div class="signature-designation"><span class="empty-field">[Designation]</span></div>
+                <div class="signature-field"><span class="signature-label">Name:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Designation:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Sign:</span><span class="signature-underline"></span></div>
+                <div class="signature-field"><span class="signature-label">Date:</span><span class="signature-underline"></span></div>
             </div>
         `;
     }
@@ -1882,7 +1884,7 @@ function previewPDF() {
                 .empty-field { color: #999; font-style: italic; }
 
                 /* Header */
-                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 20px; }
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 3px solid #d4a017; margin-bottom: 20px; }
                 .header-left { display: flex; align-items: center; gap: 15px; }
                 .pdf-logo { width: 65px; height: auto; }
                 .company-name { font-size: 16pt; font-weight: bold; color: #1a5276; }
@@ -1933,9 +1935,11 @@ function previewPDF() {
                 .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; }
                 .signature-column { flex: 1; border: 1px solid #ddd; padding: 15px; }
                 .signature-column-header { font-weight: bold; font-size: 10pt; margin-bottom: 20px; padding-bottom: 5px; border-bottom: 1px solid #333; }
-                .signature-box { margin-bottom: 30px; }
-                .signature-name { font-weight: 600; font-size: 10pt; }
-                .signature-designation { font-size: 8pt; color: #666; }
+                .signature-box { margin-bottom: 20px; }
+                .signature-field { display: flex; align-items: center; margin-bottom: 10px; font-size: 9pt; }
+                .signature-label { font-weight: 600; width: 90px; }
+                .signature-value { flex: 1; border-bottom: 1px solid #333; padding-bottom: 2px; min-height: 18px; }
+                .signature-underline { flex: 1; border-bottom: 1px solid #333; min-height: 18px; }
             </style>
             ${html}
         </div>
@@ -2006,11 +2010,13 @@ function getPDFDocumentHtml(contentHtml) {
                     .no-print { display: none !important; }
                     .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; padding: 0 !important; margin: 0 !important; }
                     .pdf-footer-print { display: block !important; }
+                    .section-header { margin-left: 0 !important; margin-right: 0 !important; }
+                    .machine-header { margin-left: 0 !important; margin-right: 0 !important; }
                 }
                 @page {
                     margin: 20mm;
                     @bottom-center {
-                        content: "OmSai Engineering & Automation (OSEA) | Service Report | Confidential";
+                        content: "OmSai Engineering & Automation (OSEA) | Service Report";
                         font-size: 8pt;
                         color: #666;
                     }
@@ -2040,7 +2046,7 @@ function getPDFDocumentHtml(contentHtml) {
                 .empty-field { color: #999; font-style: italic; }
 
                 /* Header */
-                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 2px solid #1a5276; margin-bottom: 20px; }
+                .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 3px solid #d4a017; margin-bottom: 20px; }
                 .header-left { display: flex; align-items: center; gap: 15px; }
                 .pdf-logo { width: 65px; height: auto; }
                 .company-name { font-size: 16pt; font-weight: bold; color: #1a5276; }
@@ -2109,12 +2115,11 @@ function getPDFDocumentHtml(contentHtml) {
                 .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; page-break-inside: avoid; }
                 .signature-column { flex: 1; border: 1px solid #ddd; padding: 15px; }
                 .signature-column-header { font-weight: bold; font-size: 10pt; margin-bottom: 20px; padding-bottom: 5px; border-bottom: 1px solid #333; }
-                .signature-box { margin-bottom: 30px; page-break-inside: avoid; }
-                .signature-field { margin-bottom: 12px; }
-                .signature-field-label { font-size: 9pt; font-weight: 600; }
-                .signature-field-line { border-bottom: 1px solid #333; height: 25px; margin-top: 3px; }
-                .signature-name { font-weight: 600; font-size: 10pt; }
-                .signature-designation { font-size: 8pt; color: #666; }
+                .signature-box { margin-bottom: 20px; page-break-inside: avoid; }
+                .signature-field { display: flex; align-items: center; margin-bottom: 10px; font-size: 9pt; }
+                .signature-label { font-weight: 600; width: 90px; }
+                .signature-value { flex: 1; border-bottom: 1px solid #333; padding-bottom: 2px; min-height: 18px; }
+                .signature-underline { flex: 1; border-bottom: 1px solid #333; min-height: 18px; }
 
                 /* Print footer (fallback for browsers that don't support @page rules) */
                 .pdf-footer-print { display: none; margin-top: 40px; padding-top: 15px; border-top: 1px solid #ddd; text-align: center; font-size: 8pt; color: #666; }
@@ -2160,7 +2165,7 @@ function getPDFDocumentHtml(contentHtml) {
             </div>
             <div class="pdf-wrapper">
                 ${contentHtml}
-                <div class="pdf-footer-print">OmSai Engineering & Automation (OSEA) | Service Report | Confidential</div>
+                <div class="pdf-footer-print">OmSai Engineering & Automation (OSEA) | Service Report</div>
             </div>
         </body>
         </html>

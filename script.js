@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('reportDate').value = today;
     document.getElementById('arrivalDate').value = today;
     document.getElementById('departureDate').value = today;
+    // Set min on departure to prevent selecting dates before arrival
+    document.getElementById('departureDate').min = today;
 
     // Generate unique report number
     document.getElementById('reportNo').textContent = generateReportNumber();
@@ -34,23 +36,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Date sync: When one date is changed, sync the other if empty or update calendar view
+    // Date validation: Departure cannot be before arrival
+    // When arrival changes, update departure if it's now before arrival
     document.getElementById('arrivalDate').addEventListener('change', function() {
         const departureDate = document.getElementById('departureDate');
-        if (!departureDate.value || departureDate.value < this.value) {
+        if (!departureDate.value) {
             departureDate.value = this.value;
+        } else if (departureDate.value < this.value) {
+            departureDate.value = this.value;
+            showStatus('Departure date updated to match arrival (cannot be earlier)', 'error');
         }
     });
 
+    // When departure changes, prevent it from being before arrival
     document.getElementById('departureDate').addEventListener('change', function() {
         const arrivalDate = document.getElementById('arrivalDate');
         if (!arrivalDate.value) {
             arrivalDate.value = this.value;
         } else if (this.value < arrivalDate.value) {
-            // Departure cannot be before arrival
+            // Departure cannot be before arrival - reset and warn
             this.value = arrivalDate.value;
             showStatus('Departure date cannot be before arrival date', 'error');
         }
+    });
+
+    // Also set min attribute on departure to prevent calendar from showing earlier dates
+    document.getElementById('arrivalDate').addEventListener('change', function() {
+        document.getElementById('departureDate').min = this.value;
     });
 
     // Initialize representatives (add empty OSEA rep if none from engineers)

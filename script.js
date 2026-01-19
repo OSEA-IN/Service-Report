@@ -1901,7 +1901,7 @@ function previewPDF() {
                 .section-header { background: #1a5276; color: white; padding: 10px 15px; font-size: 10pt; font-weight: bold; margin: 25px -20px 15px -20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
                 /* Info Table */
-                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border: none; }
                 .info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 9pt; vertical-align: top; }
                 .info-table .label { background: #f5f5f5; font-weight: 600; color: #333; width: 160px; }
                 .info-table .value { background: white; }
@@ -1916,7 +1916,7 @@ function previewPDF() {
                 /* Subsections (gold labels) */
                 .subsection { margin: 15px 0; }
                 .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 5px; }
-                .subsection-content { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+                .subsection-content { padding: 10px 12px; border-left: 3px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
 
                 /* Lists */
                 .pdf-list { margin: 5px 0 5px 20px; padding: 0; }
@@ -1929,7 +1929,7 @@ function previewPDF() {
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
 
                 /* Content Box */
-                .content-box { padding: 12px 15px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+                .content-box { padding: 12px 15px; border-left: 3px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
 
                 /* Signatures */
                 .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; }
@@ -2074,7 +2074,7 @@ function getPDFDocumentHtml(contentHtml) {
                 }
 
                 /* Info Table (replaces flexbox grid) */
-                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border: none; }
                 .info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 9pt; vertical-align: top; }
                 .info-table .label { background: #f5f5f5; font-weight: 600; color: #333; width: 160px; }
                 .info-table .value { background: white; }
@@ -2096,7 +2096,7 @@ function getPDFDocumentHtml(contentHtml) {
                 /* Subsections (gold labels) */
                 .subsection { margin: 15px 0; page-break-inside: avoid; }
                 .subsection-label { color: #b8860b; font-weight: bold; font-size: 9pt; margin-bottom: 5px; }
-                .subsection-content { padding: 10px 12px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
+                .subsection-content { padding: 10px 12px; border-left: 3px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 20px; }
 
                 /* Lists */
                 .pdf-list { margin: 5px 0 5px 20px; padding: 0; orphans: 3; widows: 3; }
@@ -2109,7 +2109,7 @@ function getPDFDocumentHtml(contentHtml) {
                 .pdf-table tr:nth-child(even) { background: #f8f9fa; }
 
                 /* Content Box */
-                .content-box { padding: 12px 15px; border: 1px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
+                .content-box { padding: 12px 15px; border-left: 3px solid #e0e0e0; background: #fafafa; font-size: 9pt; min-height: 30px; margin-bottom: 15px; }
 
                 /* Signatures */
                 .signatures-container { display: flex; justify-content: space-between; gap: 50px; margin-top: 25px; page-break-inside: avoid; }

@@ -1572,7 +1572,7 @@ function loadDraft() {
 
 // Helper function to build the PDF HTML content
 function buildPDFHtml() {
-    const logoBase64 = OSEA_LOGO_BASE64;
+    const logoPath = 'OSEA_logo_black.png';
 
     // Helper to show empty fields with placeholder
     const displayValue = (value, fieldName = '') => {
@@ -1582,7 +1582,7 @@ function buildPDFHtml() {
 
     let html = `
         <div class="pdf-header">
-            <img src="${logoBase64}" alt="OSEA Logo" class="pdf-logo">
+            <img src="${logoPath}" alt="OSEA Logo" class="pdf-logo">
             <div class="pdf-header-text">
                 <h1>SERVICE REPORT</h1>
                 <p>OmSai Engineering & Automation</p>

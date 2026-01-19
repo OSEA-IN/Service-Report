@@ -46,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const arrivalDate = document.getElementById('arrivalDate');
         if (!arrivalDate.value) {
             arrivalDate.value = this.value;
+        } else if (this.value < arrivalDate.value) {
+            // Departure cannot be before arrival
+            this.value = arrivalDate.value;
+            showStatus('Departure date cannot be before arrival date', 'error');
         }
     });
 
@@ -1800,6 +1804,13 @@ function validateForm() {
         errors.push('Please select a Visit Type');
     }
 
+    // Check departure is not before arrival
+    const arrivalDate = document.getElementById('arrivalDate').value;
+    const departureDate = document.getElementById('departureDate').value;
+    if (arrivalDate && departureDate && departureDate < arrivalDate) {
+        errors.push('Departure date cannot be before arrival date');
+    }
+
     if (errors.length > 0) {
         showStatus(errors.join('. '), 'error');
         return false;
@@ -1828,24 +1839,26 @@ function previewPDF() {
                 .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
                 .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
                 .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 6px 10px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 15px 0; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 8px 12px; font-size: 11pt; font-weight: bold; margin: 15px 0 10px 0; }
-                .pdf-subsection { margin: 10px 0; }
+                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
+                .pdf-section { margin: 20px 0; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+                .pdf-section:last-of-type { border-bottom: none; }
+                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
+                .pdf-subsection { margin: 12px 0; }
                 .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 5px 0 5px 20px; }
-                .pdf-list li { margin: 3px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-                .pdf-table th { background: #f5f5f5; padding: 6px 10px; border: 1px solid #ddd; text-align: left; }
-                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 40px; gap: 30px; }
+                .pdf-list { margin: 8px 0 8px 25px; }
+                .pdf-list li { margin: 4px 0; }
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
+                .pdf-table tr:nth-child(even) { background: #f8f9fa; }
+                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; gap: 40px; }
                 .pdf-signature-column { flex: 1; }
-                .sig-header { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #1a5276; }
-                .pdf-signature-box { text-align: center; margin-bottom: 20px; }
-                .signature-line { border-bottom: 1px solid #333; height: 35px; margin: 0 20px 5px 20px; }
-                .sig-name { font-weight: 600; margin: 0; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 0; }
-                .pdf-footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
+                .pdf-signature-box { text-align: center; margin-bottom: 30px; }
+                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
+                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
+                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
+                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
             </style>
             ${html}
         </div>
@@ -1888,16 +1901,29 @@ function generatePDF() {
             <title>OSEA Service Report</title>
             <style>
                 @media print {
-                    body { margin: 0; padding: 20px; }
+                    body { margin: 0; padding: 0; background: white; }
                     .no-print { display: none !important; }
+                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; }
+                }
+                @page {
+                    margin: 15mm;
                 }
                 body {
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                     font-size: 11pt;
                     line-height: 1.4;
                     color: #333;
+                    background: #f0f0f0;
+                    padding: 20px;
+                    margin: 0;
+                }
+                .pdf-wrapper {
                     background: white;
-                    padding: 20px 40px;
+                    border: 1px solid #ccc;
+                    padding: 30px 40px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }
                 .empty-field { color: #999; font-style: italic; }
                 .pdf-header {
@@ -1912,27 +1938,29 @@ function generatePDF() {
                 .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
                 .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
                 .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 6px 10px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 15px 0; page-break-inside: avoid; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 8px 12px; font-size: 11pt; font-weight: bold; margin: 15px 0 10px 0; }
-                .pdf-subsection { margin: 10px 0; }
+                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
+                .pdf-section { margin: 20px 0; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+                .pdf-section:last-of-type { border-bottom: none; }
+                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
+                .pdf-subsection { margin: 12px 0; page-break-inside: avoid; }
                 .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 5px 0 5px 20px; }
-                .pdf-list li { margin: 3px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-                .pdf-table th { background: #f5f5f5; padding: 6px 10px; border: 1px solid #ddd; text-align: left; }
-                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 40px; page-break-inside: avoid; }
-                .pdf-signature-column { width: 45%; }
-                .sig-header { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #1a5276; }
-                .pdf-signature-box { text-align: center; margin-bottom: 20px; }
-                .signature-line { border-bottom: 1px solid #333; height: 35px; margin: 0 20px 5px 20px; }
-                .sig-name { font-weight: 600; margin: 0; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 0; }
-                .pdf-footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                .pdf-list { margin: 8px 0 8px 25px; orphans: 3; widows: 3; }
+                .pdf-list li { margin: 4px 0; }
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; page-break-inside: avoid; }
+                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
+                .pdf-table tr:nth-child(even) { background: #f8f9fa; }
+                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; page-break-inside: avoid; gap: 40px; }
+                .pdf-signature-column { flex: 1; }
+                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
+                .pdf-signature-box { text-align: center; margin-bottom: 30px; page-break-inside: avoid; }
+                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
+                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
+                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
+                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
                 .back-bar {
                     background: #1a5276;
-                    padding: 10px 20px;
+                    padding: 12px 20px;
                     text-align: center;
                     position: sticky;
                     top: 0;
@@ -1968,7 +1996,9 @@ function generatePDF() {
                 <button class="back-btn" onclick="window.close()">← Back to Form</button>
                 <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
             </div>
-            ${html}
+            <div class="pdf-wrapper">
+                ${html}
+            </div>
         </body>
         </html>
     `);
@@ -1995,16 +2025,29 @@ function writePDFToWindow(printWindow) {
             <title>OSEA Service Report</title>
             <style>
                 @media print {
-                    body { margin: 0; padding: 20px; }
+                    body { margin: 0; padding: 0; background: white; }
                     .no-print { display: none !important; }
+                    .pdf-wrapper { border: none !important; box-shadow: none !important; max-width: none; }
+                }
+                @page {
+                    margin: 15mm;
                 }
                 body {
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                     font-size: 11pt;
                     line-height: 1.4;
                     color: #333;
+                    background: #f0f0f0;
+                    padding: 20px;
+                    margin: 0;
+                }
+                .pdf-wrapper {
                     background: white;
-                    padding: 20px 40px;
+                    border: 1px solid #ccc;
+                    padding: 30px 40px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }
                 .empty-field { color: #999; font-style: italic; }
                 .pdf-header {
@@ -2019,27 +2062,29 @@ function writePDFToWindow(printWindow) {
                 .pdf-header-text h1 { font-size: 18pt; color: #1a5276; margin: 0; }
                 .pdf-header-text p { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
                 .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                .pdf-info-table td { padding: 6px 10px; border: 1px solid #ddd; font-size: 10pt; }
-                .pdf-section { margin: 15px 0; page-break-inside: avoid; }
-                .pdf-section-title { background-color: #1a5276; color: white; padding: 8px 12px; font-size: 11pt; font-weight: bold; margin: 15px 0 10px 0; }
-                .pdf-subsection { margin: 10px 0; }
+                .pdf-info-table td { padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; }
+                .pdf-section { margin: 20px 0; page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+                .pdf-section:last-of-type { border-bottom: none; }
+                .pdf-section-title { background-color: #1a5276; color: white; padding: 10px 14px; font-size: 11pt; font-weight: bold; margin: 0 0 12px 0; }
+                .pdf-subsection { margin: 12px 0; page-break-inside: avoid; }
                 .pdf-subsection strong { color: #1a5276; }
-                .pdf-list { margin: 5px 0 5px 20px; }
-                .pdf-list li { margin: 3px 0; }
-                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-                .pdf-table th { background: #f5f5f5; padding: 6px 10px; border: 1px solid #ddd; text-align: left; }
-                .pdf-table td { padding: 6px 10px; border: 1px solid #ddd; }
-                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 40px; page-break-inside: avoid; }
-                .pdf-signature-column { width: 45%; }
-                .sig-header { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #1a5276; }
-                .pdf-signature-box { text-align: center; margin-bottom: 20px; }
-                .signature-line { border-bottom: 1px solid #333; height: 35px; margin: 0 20px 5px 20px; }
-                .sig-name { font-weight: 600; margin: 0; }
-                .sig-designation { font-size: 9pt; color: #666; margin: 0; }
-                .pdf-footer { margin-top: 30px; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                .pdf-list { margin: 8px 0 8px 25px; orphans: 3; widows: 3; }
+                .pdf-list li { margin: 4px 0; }
+                .pdf-table { width: 100%; border-collapse: collapse; margin-top: 8px; page-break-inside: avoid; }
+                .pdf-table th { background: #1a5276; color: white; padding: 10px 12px; border: 1px solid #1a5276; text-align: left; font-weight: 600; }
+                .pdf-table td { padding: 10px 12px; border: 1px solid #ddd; }
+                .pdf-table tr:nth-child(even) { background: #f8f9fa; }
+                .pdf-signatures { display: flex; justify-content: space-between; margin-top: 50px; page-break-inside: avoid; gap: 40px; }
+                .pdf-signature-column { flex: 1; }
+                .sig-header { text-align: center; margin-bottom: 25px; padding-bottom: 8px; border-bottom: 2px solid #1a5276; font-size: 12pt; }
+                .pdf-signature-box { text-align: center; margin-bottom: 30px; page-break-inside: avoid; }
+                .signature-line { border-bottom: 1px solid #333; height: 45px; margin: 0 15px 8px 15px; }
+                .sig-name { font-weight: 600; margin: 0; font-size: 11pt; }
+                .sig-designation { font-size: 9pt; color: #666; margin: 3px 0 0 0; }
+                .pdf-footer { margin-top: 40px; text-align: center; font-size: 9pt; color: #666; border-top: 2px solid #1a5276; padding-top: 15px; }
                 .back-bar {
                     background: #1a5276;
-                    padding: 10px 20px;
+                    padding: 12px 20px;
                     text-align: center;
                     position: sticky;
                     top: 0;
@@ -2075,7 +2120,9 @@ function writePDFToWindow(printWindow) {
                 <button class="back-btn" onclick="window.close()">← Back to Form</button>
                 <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
             </div>
-            ${html}
+            <div class="pdf-wrapper">
+                ${html}
+            </div>
         </body>
         </html>
     `);

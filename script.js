@@ -2066,9 +2066,6 @@ function getPDFDocumentHtml(contentHtml) {
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                 }
-                @media print {
-                    .section-header { margin: 25px 0 15px 0; }
-                }
 
                 /* Info Table (replaces flexbox grid) */
                 .info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
@@ -2085,9 +2082,6 @@ function getPDFDocumentHtml(contentHtml) {
                     font-size: 11pt;
                     font-weight: bold;
                     margin: 25px -35px 0 -35px;
-                }
-                @media print {
-                    .machine-header { margin: 25px 0 0 0; }
                 }
                 .machine-specs-table { width: 100%; border-collapse: collapse; border: 1px solid #ddd; border-top: none; }
                 .machine-specs-table td { padding: 8px 12px; border-right: 1px solid #ddd; font-size: 9pt; background: #f9f9f9; }
